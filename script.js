@@ -45,8 +45,8 @@ async function sendMessage() {
   addMessage("Bạn", userMessage, "user");
   input.value = "";
 
-  addMessage("GenAI", "Đang trả lời...", "bot");
-  const loadingIndex = document.querySelectorAll(".bot").length - 1;
+  addMessage("GenAI", "Đang suy nghĩ...", "bot");
+  const loadingIndex = document.querySelectorAll(".bot .bubble").length - 1;
 
   try {
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent`, {
@@ -64,8 +64,8 @@ async function sendMessage() {
     });
 
     const data = await response.json();
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Không nhận được phản hồi.";
-    document.querySelectorAll(".bot")[loadingIndex].innerHTML = `<strong>GenAI:</strong> ${reply}`;
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Mình chưa hiểu rõ lắm. Bạn thử hỏi lại được không?";
+    document.querySelectorAll(".bot .bubble")[loadingIndex].innerHTML = reply;
   } catch (err) {
     document.querySelectorAll(".bot")[loadingIndex].innerHTML = `<strong>GenAI:</strong> Lỗi kết nối hoặc API key không hợp lệ.`;
   }
@@ -73,10 +73,20 @@ async function sendMessage() {
 
 function addMessage(sender, text, type) {
   const chatbox = document.getElementById("chatbox");
-  const msg = document.createElement("div");
-  msg.className = `message ${type}`;
-  msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
-  chatbox.appendChild(msg);
+  const message = document.createElement("div");
+  message.className = `message ${type}`;
+
+  const avatar = document.createElement("div");
+  avatar.className = "avatar";
+  avatar.textContent = type === "bot" ? "🤖" : "👤";
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.textContent = text;
+
+  message.appendChild(avatar);
+  message.appendChild(bubble);
+  chatbox.appendChild(message);
   chatbox.scrollTop = chatbox.scrollHeight;
 }
 
