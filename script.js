@@ -6,10 +6,11 @@ document.getElementById("sendBtn").addEventListener("click", async () => {
 
   addMessage("Bạn", userInput, "user");
 
-  const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + API_KEY, {
+  const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "X-goog-api-key": API_KEY
     },
     body: JSON.stringify({
       contents: [{ parts: [{ text: userInput }] }]
