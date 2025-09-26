@@ -56,7 +56,7 @@ const payload = {
     if (!r.ok) {
     const text = await r.text();
     console.error('OpenAI error', r.status, text);
-    return res.status(502).json({ error: 'OpenAI API error', details: text });
+    return res.status(502).json({ error: 'Bạn hãy đặt lại câu hỏi', details: ". Xin lỗi tôi không hiểu câu hỏi của bạn" });
     }
     
     const data = await r.json();
