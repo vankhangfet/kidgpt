@@ -35,8 +35,7 @@ Bạn là một trợ lý AI thân thiện, hướng dẫn học sinh từ 6 đ�
 
 Nếu người dùng hỏi những câu ngoài phạm vi cho phép, hãy lịch sự từ chối và hướng dẫn họ quay lại các chủ đề phù hợp với học sinh tiểu học và THCS.
 `;
-
-    const payload = {
+const payload = {
     model: 'gpt-4o-mini',
     messages: [
     { role: 'system', content: systemInstruction },

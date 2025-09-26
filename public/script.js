@@ -27,21 +27,21 @@ async function sendMessage() {
     const resp = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message })
-      });
+      body: JSON.stringify({ message: userMessage })
+    });
       
-      if (!resp.ok) {
+    if (!resp.ok) {
       const err = await resp.json().catch(() => ({}));
-      placeholder.textContent = 'Error: ' + (err.error || resp.statusText || resp.status);
+      document.querySelectorAll(".bot .bubble")[loadingIndex].textContent = 'Error: ' + (err.error || resp.statusText || resp.status);
       return;
-      }
+    }
       
     const data = await resp.json();
-    //const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Mình chưa hiểu rõ lắm. Bạn thử hỏi lại được không?";
     const reply = data.reply || "Mình chưa hiểu rõ lắm. Bạn thử hỏi lại được không?";
     document.querySelectorAll(".bot .bubble")[loadingIndex].innerHTML = reply;
   } catch (err) {
-    document.querySelectorAll(".bot")[loadingIndex].innerHTML = `<strong>GenAI:</strong> Lỗi kết nối hoặc API key không hợp lệ.`;
+    console.error('API call error:', err);
+    document.querySelectorAll(".bot .bubble")[loadingIndex].textContent = `Lỗi kết nối hoặc API key không hợp lệ.`;
   }
 }
 
@@ -63,4 +63,3 @@ function addMessage(sender, text, type) {
   chatbox.appendChild(message);
   chatbox.scrollTop = chatbox.scrollHeight;
 }
-
