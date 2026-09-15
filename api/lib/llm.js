@@ -77,7 +77,7 @@ export async function requestJSON({
   fetchImpl = fetch,
 }) {
   const config = readConfig(env);
-  const deadline = Date.now() + 29000; // stay under Vercel maxDuration 30s across attempts
+  const deadline = Date.now() + 29000; // product-level cap; vercel.json maxDuration 60 is headroom so the platform never kills us first
   let useJsonMode = true;
   let attempt = 0;
   let lastError = null;
