@@ -51,7 +51,7 @@ describe('subjects', () => {
     function scan(obj, path) {
       for (const [k, v] of Object.entries(obj)) {
         if (typeof v === 'string') {
-          if (k !== 'welcomeBody') expect(`${path}.${k}`).not.toContain('<');
+          if (k !== 'welcomeBody') expect(v).not.toContain('<');
         } else if (v && typeof v === 'object') scan(v, `${path}.${k}`);
       }
     }
