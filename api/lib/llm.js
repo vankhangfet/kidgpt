@@ -3,6 +3,7 @@ import { CORRECTION_MESSAGE } from './prompts.js';
 export class LLMError extends Error {
   constructor(code, detail) {
     super(detail ? `${code}: ${detail}` : code);
+    this.name = 'LLMError';
     this.code = code;
     this.detail = detail || null;
   }
@@ -33,30 +34,36 @@ async function postChat({ config, messages, maxTokens, timeoutMs, fetchImpl, use
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   const body = { model: config.model, messages, max_tokens: maxTokens, temperature: 0.4 };
   if (useJsonMode) body.response_format = { type: 'json_object' };
-  let res;
   try {
-    res = await fetchImpl(`${config.baseUrl}/chat/completions`, {
+    const res = await fetchImpl(`${config.baseUrl}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${config.apiKey}` },
       body: JSON.stringify(body),
       signal: controller.signal,
     });
+    if (!res.ok) {
+      const detail = await res.text().catch(() => '');
+      const err = new LLMError(`http_${res.status}`, String(detail).slice(0, 500));
+      err.status = res.status;
+      throw err;
+    }
+    let data;
+    try {
+      data = await res.json();
+    } catch (err) {
+      if (err && err.name === 'AbortError') throw err;
+      throw new LLMError('bad_response', 'gateway returned non-JSON body');
+    }
+    const content = data?.choices?.[0]?.message?.content;
+    if (!content) throw new LLMError('empty_response');
+    return content;
   } catch (err) {
+    if (err instanceof LLMError) throw err;
     if (err && err.name === 'AbortError') throw new LLMError('timeout');
     throw new LLMError('network', String((err && err.message) || err));
   } finally {
     clearTimeout(timer);
   }
-  if (!res.ok) {
-    const detail = await res.text().catch(() => '');
-    const err = new LLMError(`http_${res.status}`, String(detail).slice(0, 500));
-    err.status = res.status;
-    throw err;
-  }
-  const data = await res.json();
-  const content = data?.choices?.[0]?.message?.content;
-  if (!content) throw new LLMError('empty_response');
-  return content;
 }
 
 export async function requestJSON({
@@ -68,18 +75,27 @@ export async function requestJSON({
   fetchImpl = fetch,
 }) {
   const config = readConfig(env);
+  const deadline = Date.now() + 29000; // stay under Vercel maxDuration 30s across attempts
   let useJsonMode = true;
   let attempt = 0;
   let lastError = null;
   while (attempt < 2) {
     attempt += 1;
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) throw new LLMError('timeout');
+    const attemptTimeout = Math.max(1000, Math.min(timeoutMs, remaining));
     let content;
     try {
-      content = await postChat({ config, messages, maxTokens, timeoutMs, fetchImpl, useJsonMode });
+      content = await postChat({ config, messages, maxTokens, timeoutMs: attemptTimeout, fetchImpl, useJsonMode });
     } catch (err) {
       if (err instanceof LLMError && err.status === 400 && useJsonMode) {
         useJsonMode = false;
         attempt -= 1; // same attempt again without response_format
+        continue;
+      }
+      if (err instanceof LLMError && (err.code === 'bad_response' || err.code === 'empty_response')) {
+        lastError = err;
+        messages = [...messages, { role: 'user', content: CORRECTION_MESSAGE }];
         continue;
       }
       throw err;
@@ -89,10 +105,18 @@ export async function requestJSON({
       const v = validate ? validate(parsed) : { ok: true, data: parsed };
       if (v.ok) return v.data;
       lastError = new LLMError('invalid_json', v.error ? String(v.error).slice(0, 300) : null);
-      messages = [...messages, { role: 'user', content: `${CORRECTION_MESSAGE} Schema error: ${String(v.error).slice(0, 300)}` }];
+      messages = [
+        ...messages,
+        { role: 'assistant', content: content.slice(0, 1000) },
+        { role: 'user', content: `${CORRECTION_MESSAGE} Schema error: ${String(v.error).slice(0, 300)}` },
+      ];
     } else {
       lastError = new LLMError('invalid_json');
-      messages = [...messages, { role: 'user', content: CORRECTION_MESSAGE }];
+      messages = [
+        ...messages,
+        { role: 'assistant', content: content.slice(0, 1000) },
+        { role: 'user', content: CORRECTION_MESSAGE },
+      ];
     }
   }
   throw lastError || new LLMError('invalid_json');

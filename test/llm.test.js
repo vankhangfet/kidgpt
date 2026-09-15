@@ -131,4 +131,44 @@ describe('requestJSON', () => {
     await expect(requestJSON({ messages: [{ role: 'user', content: 'q' }], fetchImpl }))
       .rejects.toMatchObject({ code: 'http_500' });
   });
+
+  it('maps non-JSON 200 body to retryable bad_response', async () => {
+    const fetchImpl = vi.fn()
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => { throw new SyntaxError('Unexpected token <'); } })
+      .mockResolvedValueOnce(okResponse('{"a":1}'));
+    const out = await requestJSON({ messages: [{ role: 'user', content: 'q' }], validate: (d) => ({ ok: true, data: d }), fetchImpl });
+    expect(out).toEqual({ a: 1 });
+  });
+
+  it('ends with http_400 when gateway 400s twice', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({ ok: false, status: 400, text: async () => 'bad' });
+    await expect(requestJSON({ messages: [{ role: 'user', content: 'q' }], fetchImpl }))
+      .rejects.toMatchObject({ code: 'http_400' });
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not mutate the caller messages array', async () => {
+    const fetchImpl = vi.fn()
+      .mockResolvedValueOnce(okResponse('garbage'))
+      .mockResolvedValueOnce(okResponse('{"a":1}'));
+    const msgs = [{ role: 'user', content: 'q' }];
+    await requestJSON({ messages: msgs, validate: (d) => ({ ok: true, data: d }), fetchImpl });
+    expect(msgs.length).toBe(1);
+  });
+
+  it('abort during body read maps to timeout', async () => {
+    const fetchImpl = vi.fn((_url, opts) => Promise.resolve({
+      ok: true,
+      status: 200,
+      json: () => new Promise((_resolve, rej) => {
+        opts.signal.addEventListener('abort', () => {
+          const e = new Error('aborted');
+          e.name = 'AbortError';
+          rej(e);
+        });
+      }),
+    }));
+    await expect(requestJSON({ messages: [{ role: 'user', content: 'q' }], fetchImpl, timeoutMs: 20 }))
+      .rejects.toMatchObject({ code: 'timeout' });
+  });
 });
