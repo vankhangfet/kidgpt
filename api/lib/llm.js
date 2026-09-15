@@ -55,7 +55,9 @@ async function postChat({ config, messages, maxTokens, timeoutMs, fetchImpl, use
       throw new LLMError('bad_response', 'gateway returned non-JSON body');
     }
     const content = data?.choices?.[0]?.message?.content;
-    if (!content) throw new LLMError('empty_response');
+    if (typeof content !== 'string' || !content) {
+      throw new LLMError('bad_response', 'non-string or empty content');
+    }
     return content;
   } catch (err) {
     if (err instanceof LLMError) throw err;

@@ -171,4 +171,12 @@ describe('requestJSON', () => {
     await expect(requestJSON({ messages: [{ role: 'user', content: 'q' }], fetchImpl, timeoutMs: 20 }))
       .rejects.toMatchObject({ code: 'timeout' });
   });
+
+  it('maps non-string content to retryable bad_response, not TypeError', async () => {
+    const fetchImpl = vi.fn()
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ choices: [{ message: { content: 123 } }] }) })
+      .mockResolvedValueOnce(okResponse('{"a":1}'));
+    const out = await requestJSON({ messages: [{ role: 'user', content: 'q' }], validate: (d) => ({ ok: true, data: d }), fetchImpl });
+    expect(out).toEqual({ a: 1 });
+  });
 });
