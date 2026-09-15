@@ -1,4 +1,7 @@
 export function logLine(event, fields = {}) {
-  const line = { ts: new Date().toISOString(), event, ...fields };
-  console.log(JSON.stringify(line));
+  try {
+    console.log(JSON.stringify({ ts: new Date().toISOString(), event, ...fields }));
+  } catch {
+    // logging must never break the request path
+  }
 }

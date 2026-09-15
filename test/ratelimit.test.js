@@ -13,12 +13,29 @@ describe('checkRateLimit', () => {
     const r = await checkRateLimit(null, '1.2.3.4');
     expect(r).toEqual({ success: true, skipped: true });
   });
-  it('delegates to limiter.limit(ip)', async () => {
+  it('delegates to limiter.limit with scoped identifier', async () => {
     const limiter = {
-      limit: async (ip) => ({ success: ip !== 'blocked' }),
+      limit: async (id) => ({ success: !id.endsWith('blocked') }),
     };
-    expect((await checkRateLimit(limiter, 'ok')).success).toBe(true);
-    expect((await checkRateLimit(limiter, 'blocked')).success).toBe(false);
+    expect((await checkRateLimit(limiter, 'ok', 'chat')).success).toBe(true);
+    expect((await checkRateLimit(limiter, 'blocked', 'chat')).success).toBe(false);
+  });
+  it('scopes the limiter key per endpoint', async () => {
+    const seen = [];
+    const limiter = { limit: async (id) => { seen.push(id); return { success: true }; } };
+    await checkRateLimit(limiter, '1.2.3.4', 'chat');
+    await checkRateLimit(limiter, '1.2.3.4', 'judge');
+    expect(seen).toEqual(['chat:1.2.3.4', 'judge:1.2.3.4']);
+  });
+  it('fails open when upstash throws', async () => {
+    const limiter = { limit: async () => { throw new Error('upstash down'); } };
+    const r = await checkRateLimit(limiter, '1.2.3.4', 'chat');
+    expect(r.success).toBe(true);
+    expect(r.error).toBe(true);
+  });
+  it('creates a limiter when env is complete', () => {
+    const limiter = createLimiter({ UPSTASH_REDIS_REST_URL: 'https://x.upstash.io', UPSTASH_REDIS_REST_TOKEN: 't' });
+    expect(limiter && typeof limiter.limit).toBe('function');
   });
 });
 
