@@ -15,6 +15,7 @@ export function createLimiter(env = process.env) {
     redis,
     limiter: Ratelimit.fixedWindow(20, '5 m'),
     prefix: 'kidgpt',
+    timeout: 1000,
   });
 }
 

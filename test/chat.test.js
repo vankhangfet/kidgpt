@@ -124,3 +124,23 @@ describe('POST /api/chat', () => {
     expect(res.body.error).toBe('not_configured');
   });
 });
+
+describe('POST /api/chat rate limit', () => {
+  it('returns 429 when rate limit denies', async () => {
+    vi.resetModules();
+    vi.doMock('../api/lib/ratelimit.js', () => ({
+      createLimiter: () => ({}),
+      checkRateLimit: async () => ({ success: false, skipped: false }),
+      clientIp: () => '1.2.3.4',
+    }));
+    process.env.LLM_BASE_URL = 'http://llm.test/v1';
+    process.env.LLM_API_KEY = 'k';
+    process.env.LLM_MODEL = 'm1';
+    const h = (await import('../api/chat.js')).default;
+    vi.doUnmock('../api/lib/ratelimit.js');
+    const res = mockRes();
+    await h({ method: 'POST', body: { message: 'q' }, headers: {} }, res);
+    expect(res.code).toBe(429);
+    expect(res.body.error).toBe('rate_limited');
+  });
+});
