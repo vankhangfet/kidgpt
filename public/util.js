@@ -15,9 +15,13 @@ function normalize(s) {
 export function checkAnswer(userText, check) {
   if (check === null || check === undefined) return false;
   if (typeof check === 'number') {
-    const m = String(userText).match(/-?\d+(?:[.,]\d+)?/);
-    if (!m) return false;
-    return Number(m[0].replace(',', '.')) === check;
+    const tokens = String(userText).matchAll(/[-−]?\d+(?:[.,]\d+)?/g);
+    for (const m of tokens) {
+      let raw = m[0].replace('−', '-');
+      if (/^\d{1,3}(\.\d{3})+$/.test(raw)) raw = raw.replace(/\./g, '');
+      if (Number(raw.replace(',', '.')) === check) return true;
+    }
+    return false;
   }
   return normalize(userText) === normalize(check);
 }
