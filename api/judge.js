@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     const judge = await requestJSON({
       messages: buildJudgeMessages({ question, stepQuestion, childAnswer, lang }),
       validate: validateJudge,
-      maxTokens: 300,
+      maxTokens: 500,
     });
     logLine('judge', { lang, verdict: judge.verdict, latencyMs: Date.now() - started });
     return res.status(200).json({ judge });
@@ -41,6 +41,9 @@ export default async function handler(req, res) {
     logLine('judge_error', { lang, code: err instanceof LLMError ? err.code : 'unknown', latencyMs: Date.now() - started });
     if (err instanceof LLMError && err.code === 'timeout') {
       return res.status(504).json({ error: 'timeout' });
+    }
+    if (err instanceof LLMError && err.code === 'missing_api_key') {
+      return res.status(500).json({ error: 'not_configured' });
     }
     return res.status(502).json({ error: 'judge_invalid' });
   }

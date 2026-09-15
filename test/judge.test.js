@@ -76,9 +76,10 @@ describe('POST /api/judge', () => {
 
   it('returns 429 when rate limit denies', async () => {
     vi.resetModules();
+    let limitArgs = null;
     vi.doMock('../api/lib/ratelimit.js', () => ({
       createLimiter: () => ({}),
-      checkRateLimit: async () => ({ success: false, skipped: false }),
+      checkRateLimit: async (...a) => { limitArgs = a; return { success: false, skipped: false }; },
       clientIp: () => '1.2.3.4',
     }));
     const h = (await import('../api/judge.js')).default;
@@ -87,5 +88,22 @@ describe('POST /api/judge', () => {
     await h({ method: 'POST', body: { question: 'Q', stepQuestion: 'S', childAnswer: 'A' }, headers: {} }, res);
     expect(res.code).toBe(429);
     expect(res.body.error).toBe('rate_limited');
+    expect(limitArgs[2]).toBe('judge');
+  });
+
+  it('returns 504 on LLM timeout', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(Object.assign(new Error('t'), { name: 'AbortError' })));
+    const res = mockRes();
+    await handler({ method: 'POST', body: { question: 'Q', stepQuestion: 'S', childAnswer: 'A' }, headers: {} }, res);
+    expect(res.code).toBe(504);
+    expect(res.body.error).toBe('timeout');
+  });
+
+  it('returns 500 not_configured when api key missing', async () => {
+    delete process.env.LLM_API_KEY;
+    const res = mockRes();
+    await handler({ method: 'POST', body: { question: 'Q', stepQuestion: 'S', childAnswer: 'A' }, headers: {} }, res);
+    expect(res.code).toBe(500);
+    expect(res.body.error).toBe('not_configured');
   });
 });
