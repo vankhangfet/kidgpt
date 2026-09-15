@@ -65,6 +65,19 @@ describe('sanitizeText', () => {
     expect(sanitizeText('x'.repeat(600)).length).toBe(500);
     expect(sanitizeText(null)).toBe('');
   });
+  it('preserves math comparison operators', () => {
+    expect(sanitizeText('so sanh 2 < 4 va 5 > 1')).toBe('so sanh 2 < 4 va 5 > 1');
+  });
+  it('strips tag-shaped runs only', () => {
+    expect(sanitizeText('a <img src=x> b')).toBe('a b');
+    expect(sanitizeText('<b>bold</b> text')).toBe('bold text');
+  });
+  it('caps input before regex — no ReDoS on long angle-bracket runs', () => {
+    const start = Date.now();
+    const out = sanitizeText('<'.repeat(100000));
+    expect(Date.now() - start).toBeLessThan(1000);
+    expect(out.length).toBeLessThanOrEqual(500);
+  });
 });
 
 describe('sanitizeHistory', () => {

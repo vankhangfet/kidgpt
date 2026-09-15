@@ -77,8 +77,9 @@ export function validateJudge(data) {
 }
 
 export function sanitizeText(text, maxLen = 500) {
-  return String(text ?? '')
-    .replace(/<[^>]*>/g, '')
+  const capped = String(text ?? '').slice(0, maxLen * 4);
+  return capped
+    .replace(/<[/!a-zA-Z][^>]*>/g, '')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, maxLen);
