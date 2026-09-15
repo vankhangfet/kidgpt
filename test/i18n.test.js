@@ -26,10 +26,40 @@ describe('subjects', () => {
       expect(typeof subjectLabel('en', s)).toBe('string');
     }
   });
-  it('placeholder + suggests exist for every subject', () => {
+  it('placeholder + suggests exist for every subject in both langs', () => {
     for (const s of SUBJECTS) {
-      expect(placeholderFor('vi', s).length).toBeGreaterThan(5);
-      expect(suggestsFor('en', s).length).toBe(3);
+      for (const lang of ['vi', 'en']) {
+        expect(placeholderFor(lang, s).length).toBeGreaterThan(5);
+        expect(suggestsFor(lang, s).length).toBe(3);
+      }
     }
+  });
+  it('fallbackPlan nested keys have parity', () => {
+    expect(Object.keys(STRINGS.vi.fallbackPlan).sort()).toEqual(Object.keys(STRINGS.en.fallbackPlan).sort());
+    STRINGS.vi.fallbackPlan.steps.forEach((s, i) => {
+      expect(Object.keys(s).sort()).toEqual(['question', 'tip']);
+      expect(Object.keys(STRINGS.en.fallbackPlan.steps[i]).sort()).toEqual(['question', 'tip']);
+    });
+  });
+  it('cheers have 4 variants in both langs', () => {
+    expect(STRINGS.vi.cheers.length).toBe(4);
+    expect(STRINGS.en.cheers.length).toBe(4);
+  });
+  it('welcomeBody contains strong in both langs, no other string contains markup', () => {
+    expect(STRINGS.vi.welcomeBody).toMatch(/<strong>.*<\/strong>/);
+    expect(STRINGS.en.welcomeBody).toMatch(/<strong>.*<\/strong>/);
+    function scan(obj, path) {
+      for (const [k, v] of Object.entries(obj)) {
+        if (typeof v === 'string') {
+          if (k !== 'welcomeBody') expect(`${path}.${k}`).not.toContain('<');
+        } else if (v && typeof v === 'object') scan(v, `${path}.${k}`);
+      }
+    }
+    scan(STRINGS.vi, 'vi');
+    scan(STRINGS.en, 'en');
+  });
+  it('t() falls back to vi for unknown lang', () => {
+    expect(t('xx', 'startOver')).toBe('Bắt đầu lại');
+    expect(subjectLabel('xx', 'math')).toBe('Toán');
   });
 });

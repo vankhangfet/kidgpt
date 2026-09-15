@@ -9,7 +9,7 @@ export const STRINGS = {
     welcomeLead: 'Chào bạn! Mình là Sparkle ✨',
     welcomeBody: 'Mình sẽ không đưa đáp án ngay — mình giúp bạn <strong>tự tìm ra đáp án</strong> từng bước nhỏ, có hình minh họa dễ thương. Chọn một chủ đề hoặc hỏi mình bất cứ điều gì nhé!',
     inputPlaceholder: 'Hỏi mình bất cứ điều gì, ví dụ "25 + 17 = ?"',
-    nextStep: 'Xem bước tiếp',
+    nextStep: 'Xem bước tiếp theo',
     needHint: 'Cho mình gợi ý',
     reveal: 'Mình làm thử rồi — xem đáp án',
     hintLead: 'Đây là gợi ý nhỏ nè…',
@@ -25,7 +25,7 @@ export const STRINGS = {
     cheers: ['Chính xác! Đúng rồi!', 'Bạn giỏi quá! 🎉', 'Chuẩn luôn — suy luận cực đỉnh!', 'Tuyệt vời, chính là thế!'],
     aidBlocks: 'Khối số — que cao là 10, khối nhỏ là 1',
     aidGroups: 'Nhóm chấm — đếm thử từng nhóm nhé',
-    aidTiles: 'Ô chữ — ô vàng là nguyên âm (a, e, i, o, u)',
+    aidTiles: 'Ô chữ cái — ô vàng là nguyên âm (a, e, i, o, u)',
     aidFlow: 'Các bước diễn ra theo trình tự',
     fallbackPlan: {
       intro: 'Mình chưa đọc được câu hỏi — nhưng cứ làm thám tử thôi! Trước hết hãy hiểu đề bài đã nhé.',
@@ -34,7 +34,7 @@ export const STRINGS = {
         { question: 'Mình đã biết những số hoặc manh mối nào?', tip: 'Gạch chân hoặc liệt kê chúng ra giấy.' },
         { question: 'Mình có thể làm gì với các số đó — cộng, bớt, chia hay nhóm?', tip: 'Nối câu chuyện của đề bài với một phép tính.' },
       ],
-      answerLine: 'Hãy viết các số ra giấy và chọn phép tính — rồi gửi cách làm của bạn, mình sẽ cùng kiểm tra!',
+      answerLine: 'Hãy thử làm theo các bước trên rồi gửi cách nghĩ của bạn — mình sẽ cùng kiểm tra!',
     },
   },
   en: {
@@ -64,13 +64,13 @@ export const STRINGS = {
     aidTiles: 'Letter tiles — yellow ones are vowels (a, e, i, o, u)',
     aidFlow: 'The steps happen in this order',
     fallbackPlan: {
-      intro: "I couldn't quite read that — but let's be math detectives anyway! First, let's understand the problem.",
+      intro: "I couldn't quite read that — but let's be thinking detectives anyway! First, let's understand the question.",
       steps: [
         { question: 'What is the question really asking you to find?', tip: 'Say it back in your own words.' },
         { question: 'What numbers or clues do we already know?', tip: 'Underline or list them.' },
         { question: 'What could we do with those numbers — add, take away, share, or group?', tip: 'Match the story to an action.' },
       ],
-      answerLine: 'Try writing your numbers down and picking the action — then send me your working and I will check your thinking!',
+      answerLine: 'Try the steps above, then send me your thinking — I will check it with you!',
     },
   },
 };
@@ -115,11 +115,13 @@ const SUGGESTS = {
 };
 
 export function t(lang, key) {
-  return STRINGS[lang][key];
+  const L = STRINGS[lang] || STRINGS.vi;
+  return L[key];
 }
 
 export function subjectLabel(lang, subject) {
-  return SUBJECT_LABELS[lang][subject];
+  const L = SUBJECT_LABELS[lang] || SUBJECT_LABELS.vi;
+  return L[subject];
 }
 
 export function placeholderFor(lang, subject) {
