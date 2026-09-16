@@ -313,6 +313,7 @@ async function judgeFlow(text) {
       addCheer(t(lang, 'tryAgain'), 'try');
     }
   } catch (e) {
+    if (gen !== session) return;
     addCheer(t(lang, 'judgeFail'), 'try');
   } finally {
     think.remove();
@@ -337,7 +338,12 @@ function tryClientCheck(text) {
 
 function handleUserText(text) {
   text = (text || '').trim();
-  if (!text || busy) return;
+  if (!text) return;
+  if (busy) {
+    input.value = text;
+    $('#send').disabled = false;
+    return;
+  }
   addMsg('you', esc(text));
   if (active && active.plan) {
     if (tryClientCheck(text)) return;

@@ -40,8 +40,11 @@ describe('checkRateLimit', () => {
 });
 
 describe('clientIp', () => {
-  it('takes first ip from x-forwarded-for', () => {
-    expect(clientIp({ headers: { 'x-forwarded-for': '1.1.1.1, 2.2.2.2' } })).toBe('1.1.1.1');
+  it('prefers x-real-ip over x-forwarded-for', () => {
+    expect(clientIp({ headers: { 'x-real-ip': '9.9.9.9', 'x-forwarded-for': '1.1.1.1, 2.2.2.2' } })).toBe('9.9.9.9');
+  });
+  it('takes the last entry of x-forwarded-for (platform-appended real ip)', () => {
+    expect(clientIp({ headers: { 'x-forwarded-for': '1.1.1.1, 2.2.2.2' } })).toBe('2.2.2.2');
   });
   it('returns null when absent', () => {
     expect(clientIp({ headers: {} })).toBeNull();

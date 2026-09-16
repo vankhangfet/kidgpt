@@ -31,7 +31,13 @@ export async function checkRateLimit(limiter, ip, scope = 'global') {
 }
 
 export function clientIp(req) {
-  const fwd = req.headers && req.headers['x-forwarded-for'];
-  if (typeof fwd === 'string' && fwd) return fwd.split(',')[0].trim();
+  const h = (req && req.headers) || {};
+  const real = h['x-real-ip'];
+  if (typeof real === 'string' && real.trim()) return real.trim();
+  const fwd = h['x-forwarded-for'];
+  if (typeof fwd === 'string' && fwd) {
+    const parts = fwd.split(',').map((p) => p.trim()).filter(Boolean);
+    return parts.length ? parts[parts.length - 1] : null;
+  }
   return null;
 }
