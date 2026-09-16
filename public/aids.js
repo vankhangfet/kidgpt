@@ -76,7 +76,7 @@ function stepFlow(aid, lang) {
     const icon = Object.hasOwn(ICONS, s.icon) ? ICONS[s.icon] : ICONS.question;
     return `<div class="flow-step"><span class="flow-ic" aria-hidden="true">${icon}</span><span class="flow-label">${esc(String(s.label || '').slice(0, 40))}</span></div>`;
   });
-  const arrow = `<span class="flow-arrow">${ICONS.arrow}</span>`;
+  const arrow = `<span class="flow-arrow" aria-hidden="true">${ICONS.arrow}</span>`;
   return aidWrap(t(lang, 'aidFlow'), `<div class="flow">${parts.join(arrow)}</div>`);
 }
 
