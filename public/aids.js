@@ -49,7 +49,7 @@ function groupDots(aid, lang) {
   for (let g = 0; g < groups; g++) {
     let dots = '';
     for (let i = 0; i < perGroup; i++) {
-      dots += `<span class="dot" style="animation-delay:${(g * perGroup + i) * 0.04}s"></span>`;
+      dots += `<span class="dot" style="animation-delay:${Math.min((g * perGroup + i) * 0.04, 1.8)}s"></span>`;
     }
     out += `<div class="dot-group">${dots}</div>`;
   }
