@@ -28,7 +28,7 @@ SCHEMA JSON:
 Với refusal chỉ cần: { "type": "refusal", "message": "loi tu choi than thien" }
 
 CHỌN aid:
-- number-blocks: cộng/trừ hai số 0–9999 (que chục + khối đơn vị minh họa).
+- number-blocks: cộng/trừ hai số 0–999 (que chục + khối đơn vị minh họa).
 - group-dots: nhân/chia (nhóm chấm tròn); groups và perGroup mỗi số từ 1 đến 12 — vượt quá → "aid": null.
 - letter-tiles: đánh vần / chính tả một từ ngắn ≤ 24 ký tự; dài hơn → "aid": null.
 - step-flow: quá trình có trình tự, tối đa 6 bước, mỗi label ≤ 40 ký tự (VD vòng tuần hoàn nước: sun → drop → cloud → rain).
@@ -64,7 +64,7 @@ JSON SCHEMA:
 For refusal only: { "type": "refusal", "message": "kind refusal" }
 
 CHOOSING aid:
-- number-blocks: add/subtract two numbers 0–9999 (ten-rods + unit cubes).
+- number-blocks: add/subtract two numbers 0–999 (ten-rods + unit cubes).
 - group-dots: multiply/divide (groups of dots); groups and perGroup each from 1 to 12 — otherwise → "aid": null.
 - letter-tiles: spelling a short word up to 24 characters; longer → "aid": null.
 - step-flow: ordered processes, at most 6 steps, each label up to 40 characters (e.g. water cycle: sun → drop → cloud → rain).

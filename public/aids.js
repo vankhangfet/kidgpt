@@ -14,8 +14,10 @@ const ICONS = {
   star: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6-5.3-3-5.3 3 1.2-6L3.4 9.3l6-.7z"/></svg>',
 };
 
+const VI_VOWELS = 'aàáảãạăằắẳẵặâầấẩẫậeèéẻẽẹêềếểễệiìíỉĩịoòóỏõọôồốổỗộơờớởỡợuùúủũụưừứửữựyỳýỷỹỵ';
+
 function aidWrap(title, inner) {
-  return `<div class="aid"><h4><span class="aid-ic">${ICONS.star}</span>${esc(title)}</h4>${inner}</div>`;
+  return `<div class="aid"><h4><span class="aid-ic" aria-hidden="true">${ICONS.star}</span>${esc(title)}</h4>${inner}</div>`;
 }
 
 function isInt(n, min, max) {
@@ -23,16 +25,17 @@ function isInt(n, min, max) {
 }
 
 function numberBlocks(aid, lang) {
-  const [a, b] = aid.numbers || [];
+  const nums = Array.isArray(aid.numbers) ? aid.numbers : [];
+  const [a, b] = nums;
   if (!isInt(a, 0, 9999) || !isInt(b, 0, 9999)) return '';
   const sign = aid.operation === 'sub' ? '−' : '+';
   function group(n) {
     const tens = Math.floor(n / 10);
     const ones = n % 10;
     let rods = '';
-    for (let i = 0; i < tens; i++) rods += `<span class="rod" style="animation-delay:${i * 0.05}s"></span>`;
+    for (let i = 0; i < tens; i++) rods += `<span class="rod" style="animation-delay:${Math.min(i * 0.05, 1.5)}s"></span>`;
     let cubes = '';
-    for (let i = 0; i < ones; i++) cubes += `<span class="cube" style="animation-delay:${0.3 + i * 0.05}s"></span>`;
+    for (let i = 0; i < ones; i++) cubes += `<span class="cube" style="animation-delay:${Math.min(0.3 + i * 0.05, 1.8)}s"></span>`;
     return `<div class="block-group"><div class="cap">${n}</div><div class="tens">${rods}</div>${ones ? `<div class="ones">${cubes}</div>` : ''}</div>`;
   }
   return aidWrap(t(lang, 'aidBlocks'),
@@ -56,20 +59,22 @@ function groupDots(aid, lang) {
 function letterTiles(aid, lang) {
   const word = String(aid.word || '');
   if (!word || word.length > 24 || !/^[^\s]+$/.test(word)) return '';
-  const vowels = 'aeiouAEIOU';
   const tiles = word.split('').map((ch, i) => {
-    const cls = vowels.includes(ch) ? ' tile vowel' : ' tile';
+    const isVowel = VI_VOWELS.includes(ch.toLowerCase());
+    const cls = isVowel ? ' tile vowel' : ' tile';
     return `<span class="${cls.trim()}" style="animation-delay:${i * 0.06}s">${esc(ch.toUpperCase())}</span>`;
   }).join('');
   return aidWrap(t(lang, 'aidTiles'), `<div class="tiles">${tiles}</div>`);
 }
 
 function stepFlow(aid, lang) {
-  const steps = Array.isArray(aid.steps) ? aid.steps.slice(0, 6) : [];
+  const steps = Array.isArray(aid.steps)
+    ? aid.steps.filter((s) => s && typeof s === 'object').slice(0, 6)
+    : [];
   if (!steps.length) return '';
   const parts = steps.map((s) => {
-    const icon = ICONS[s.icon] || ICONS.question;
-    return `<div class="flow-step"><span class="flow-ic">${icon}</span><span class="flow-label">${esc(String(s.label || '').slice(0, 40))}</span></div>`;
+    const icon = Object.hasOwn(ICONS, s.icon) ? ICONS[s.icon] : ICONS.question;
+    return `<div class="flow-step"><span class="flow-ic" aria-hidden="true">${icon}</span><span class="flow-label">${esc(String(s.label || '').slice(0, 40))}</span></div>`;
   });
   const arrow = `<span class="flow-arrow">${ICONS.arrow}</span>`;
   return aidWrap(t(lang, 'aidFlow'), `<div class="flow">${parts.join(arrow)}</div>`);

@@ -41,4 +41,26 @@ describe('renderAid', () => {
     expect(renderAid({ type: 'number-blocks', numbers: [-1, 5], operation: 'add' }, 'vi')).toBe('');
     expect(renderAid({ type: 'letter-tiles', word: '' }, 'vi')).toBe('');
   });
+  it('returns empty string for crash-shaped params, not TypeError', () => {
+    expect(renderAid({ type: 'number-blocks', numbers: {}, operation: 'add' }, 'vi')).toBe('');
+    expect(renderAid({ type: 'step-flow', steps: [null] }, 'vi')).toBe('');
+  });
+  it('escapes payload words per character', () => {
+    const html = renderAid({ type: 'letter-tiles', word: '"><svg/onload=alert(1)>' }, 'en');
+    // scope to the tiles region: the aidWrap header legitimately contains
+    // a decorative <svg> icon, only the payload must stay escaped
+    const tiles = html.slice(html.indexOf('<div class="tiles">'));
+    expect(tiles).not.toContain('<svg');
+    expect(tiles).toContain('&lt;');
+  });
+  it('caps step-flow at six steps', () => {
+    const steps = [];
+    for (let i = 0; i < 8; i++) steps.push({ icon: 'sun', label: 'S' + i });
+    const html = renderAid({ type: 'step-flow', steps }, 'vi');
+    expect((html.match(/class="flow-step"/g) || []).length).toBe(6);
+  });
+  it('flags vietnamese vowels including diacritics', () => {
+    const html = renderAid({ type: 'letter-tiles', word: 'mèo' }, 'vi');
+    expect((html.match(/tile vowel/g) || []).length).toBe(2);
+  });
 });

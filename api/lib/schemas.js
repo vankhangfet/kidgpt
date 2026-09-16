@@ -5,7 +5,7 @@ export const AID_ICONS = ['sun', 'cloud', 'rain', 'drop', 'seed', 'sprout', 'arr
 
 const numberBlocks = z.object({
   type: z.literal('number-blocks'),
-  numbers: z.tuple([z.number().int().min(0).max(9999), z.number().int().min(0).max(9999)]),
+  numbers: z.tuple([z.number().int().min(0).max(999), z.number().int().min(0).max(999)]),
   operation: z.enum(['add', 'sub']),
 });
 

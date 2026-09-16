@@ -37,6 +37,9 @@ describe('validatePlan', () => {
     delete bad.answer;
     expect(validatePlan(bad).ok).toBe(false);
   });
+  it('rejects number-blocks above 999', () => {
+    expect(validatePlan({ ...validPlan, aid: { type: 'number-blocks', numbers: [1000, 5], operation: 'add' } }).ok).toBe(false);
+  });
   it('accepts all four aid types', () => {
     const aids = [
       { type: 'group-dots', groups: 3, perGroup: 4 },

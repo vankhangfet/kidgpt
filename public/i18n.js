@@ -25,7 +25,7 @@ export const STRINGS = {
     cheers: ['Chính xác! Đúng rồi!', 'Bạn giỏi quá! 🎉', 'Chuẩn luôn — suy luận cực đỉnh!', 'Tuyệt vời, chính là thế!'],
     aidBlocks: 'Khối số — que cao là 10, khối nhỏ là 1',
     aidGroups: 'Nhóm chấm — đếm thử từng nhóm nhé',
-    aidTiles: 'Ô chữ cái — ô vàng là nguyên âm (a, e, i, o, u)',
+    aidTiles: 'Ô chữ cái — ô vàng là nguyên âm (a, e, i, o, u, ơ, ư, â, ê, ô)',
     aidFlow: 'Các bước diễn ra theo trình tự',
     fallbackPlan: {
       intro: 'Mình chưa đọc được câu hỏi — nhưng cứ làm thám tử thôi! Trước hết hãy hiểu đề bài đã nhé.',
