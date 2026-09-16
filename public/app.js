@@ -32,6 +32,8 @@ let active = null;         // { plan, question, revealed, stepEls, nextBtn }
 let forcedSubject = null;
 let hintLevel = 0;
 let failStreak = 0;
+let busy = false;
+let session = 0;
 
 function scrollDown() { stream.scrollTop = stream.scrollHeight; }
 
@@ -139,6 +141,7 @@ function onNextStep() {
     curEl.classList.add('done');
   }
   if (active.revealed < active.plan.steps.length) {
+    hintLevel = 0;
     const el = active.stepEls[active.revealed];
     el.classList.add('revealed', 'current');
     active.revealed += 1;
@@ -218,6 +221,9 @@ function showErrorBubble(retryText) {
 /* ------------------------------------------------ api calls */
 
 async function planFlow(text) {
+  if (busy) return;
+  busy = true;
+  const gen = session;
   active = null;
   const think = showThinking();
   try {
@@ -231,8 +237,13 @@ async function planFlow(text) {
         subject: forcedSubject,
       }),
     });
-    if (!res.ok) throw new Error('http_' + res.status);
+    if (!res.ok) {
+      const err = new Error('http_' + res.status);
+      err.status = res.status;
+      throw err;
+    }
     const data = await res.json();
+    if (gen !== session) return;
     failStreak = 0;
     history.push({ role: 'user', content: text });
     const plan = data.plan;
@@ -243,29 +254,34 @@ async function planFlow(text) {
       history.push({ role: 'assistant', content: plan.intro });
       history = history.slice(-10);
       active = { question: text };
-      highlightSubject(plan.subject);
+      if (!forcedSubject) highlightSubject(plan.subject);
       renderTurn(plan);
     }
     history = history.slice(-10);
   } catch (e) {
+    if (gen !== session) return;
     failStreak += 1;
     if (failStreak >= 2) {
       failStreak = 0;
       renderFallbackPlan();
+    } else if (e && e.status === 429) {
+      addMsg('tutor', '<p class="err">' + esc(t(lang, 'rateLimited')) + '</p>');
     } else {
       showErrorBubble(text);
     }
   } finally {
     think.remove();
+    busy = false;
   }
 }
 
 async function judgeFlow(text) {
-  if (!active || !active.plan) {
+  if (!active || !active.plan || !active.question) {
     await planFlow(text);
     return;
   }
   const step = active.plan.steps[active.revealed - 1];
+  const gen = session;
   const think = showThinking();
   try {
     const res = await fetch('/api/judge', {
@@ -280,8 +296,10 @@ async function judgeFlow(text) {
     });
     if (!res.ok) throw new Error('http_' + res.status);
     const data = await res.json();
+    if (gen !== session) return;
     const judge = data.judge;
     if (judge.verdict === 'new_question') {
+      think.remove();
       await planFlow(text);
       return;
     }
@@ -316,7 +334,7 @@ function tryClientCheck(text) {
 
 function handleUserText(text) {
   text = (text || '').trim();
-  if (!text) return;
+  if (!text || busy) return;
   addMsg('you', esc(text));
   if (active && active.plan) {
     if (tryClientCheck(text)) return;
@@ -375,7 +393,7 @@ function applyLang() {
   $('#tagline').textContent = t(lang, 'tagline');
   $('#resetLabel').textContent = t(lang, 'startOver');
   $('#langToggle').textContent = t(lang, 'langToggle');
-  $('#langToggle').removeAttribute('aria-label');
+  $('#langToggle').setAttribute('aria-label', t(lang, 'langAria'));
   $('#rail').setAttribute('aria-label', t(lang, 'railTitle'));
   $('#input').setAttribute('aria-label', t(lang, 'inputLabel'));
   $('#send').setAttribute('aria-label', t(lang, 'sendAria'));
@@ -415,12 +433,14 @@ function welcome() {
 
 function init() {
   $('#send').innerHTML = I.send;
+  $('#send').disabled = true;
   $('#langToggle').addEventListener('click', () => {
     lang = lang === 'vi' ? 'en' : 'vi';
     localStorage.setItem('kidgpt-lang', lang);
     applyLang();
   });
   $('#reset').addEventListener('click', () => {
+    session += 1;
     stream.innerHTML = '';
     active = null;
     forcedSubject = null;
