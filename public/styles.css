@@ -1,49 +1,30 @@
 :root {
   /* neutrals (70–90% of pixels) */
-  --bg: #f7f9fc;
   --bg:      oklch(98% 0.012 235);   /* soft sky white */
-  --bg-2: #eef1f7;
   --bg-2:    oklch(95% 0.02 235);    /* rail / recessed */
-  --surface: #ffffff;
   --surface: oklch(100% 0 0);        /* cards, bubbles */
-  --fg: #2c3050;
   --fg:      oklch(30% 0.06 265);    /* indigo ink */
-  --muted: #5a5f80;
   --muted:   oklch(52% 0.04 265);
-  --border: #e2e5ee;
   --border:  oklch(90% 0.02 250);
 
   /* accents — coral = child/you, teal = tutor. Each capped ~2 uses/region */
-  --child: #ef6a4e;
   --child:      oklch(66% 0.16 32);   /* warm coral */
-  --child-soft: #fbe3d7;
   --child-soft: oklch(94% 0.05 40);
-  --tutor: #30a5a2;
   --tutor:      oklch(64% 0.11 195);  /* friendly teal */
-  --tutor-soft: #ddf2f1;
   --tutor-soft: oklch(95% 0.035 195);
 
   /* semantic status */
-  --success: #37b86b;
   --success:      oklch(68% 0.15 150);
-  --success-soft: #ddf3e6;
   --success-soft: oklch(94% 0.06 150);
-  --warn: #e8bf59;
   --warn:         oklch(78% 0.14 75);
-  --warn-soft: #faf0d7;
   --warn-soft:    oklch(95% 0.06 80);
 
   /* subject hues (used only on subject chips + aid headers) */
-  --math: #5a5fd1;
   --math:    oklch(64% 0.14 265);
-  --reading: #e05a92;
   --reading: oklch(66% 0.15 340);
-  --science: #3aa877;
   --science: oklch(64% 0.13 160);
-  --curio: #d9a13f;
   --curio:   oklch(72% 0.14 60);
   --english: oklch(60% 0.12 300);
-  --english-fallback: #9a5fd0;
 
   --radius:   18px;
   --radius-lg: 26px;
@@ -57,6 +38,18 @@
   --shadow-sm: 0 2px 6px oklch(50% 0.05 265 / 0.08);
   --shadow-md: 0 8px 24px oklch(50% 0.08 265 / 0.12);
   --shadow-pop: 0 12px 40px oklch(50% 0.1 265 / 0.16);
+}
+
+/* flat fallbacks for browsers without oklch() (custom props parse any
+   token stream, so hex-before-oklch inside :root would never win) */
+@supports not (color: oklch(50% 0.1 200)) {
+  :root {
+    --bg: #f7f9fc; --bg-2: #eef1f7; --surface: #ffffff; --fg: #2c3050;
+    --muted: #5a5f80; --border: #e2e5ee; --child: #ef6a4e; --child-soft: #fbe3d7;
+    --tutor: #30a5a2; --tutor-soft: #ddf2f1; --success: #37b86b; --success-soft: #ddf3e6;
+    --warn: #e8bf59; --warn-soft: #faf0d7; --math: #5a5fd1; --reading: #e05a92;
+    --science: #3aa877; --curio: #d9a13f; --english: #9a5fd0;
+  }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
