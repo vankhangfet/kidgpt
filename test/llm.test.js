@@ -21,6 +21,7 @@ afterEach(() => {
   delete process.env.LLM_BASE_URL;
   delete process.env.LLM_API_KEY;
   delete process.env.LLM_MODEL;
+  delete process.env.LLM_EXTRA_BODY;
 });
 
 describe('readConfig', () => {
@@ -178,5 +179,30 @@ describe('requestJSON', () => {
       .mockResolvedValueOnce(okResponse('{"a":1}'));
     const out = await requestJSON({ messages: [{ role: 'user', content: 'q' }], validate: (d) => ({ ok: true, data: d }), fetchImpl });
     expect(out).toEqual({ a: 1 });
+  });
+});
+
+describe('LLM_EXTRA_BODY', () => {
+  it('merges valid extra body into the request', async () => {
+    process.env.LLM_EXTRA_BODY = '{"thinking":{"type":"disabled"}}';
+    const fetchImpl = vi.fn().mockResolvedValue(okResponse('{"a":1}'));
+    await requestJSON({ messages: [{ role: 'user', content: 'q' }], validate: (d) => ({ ok: true, data: d }), fetchImpl });
+    const body = JSON.parse(fetchImpl.mock.calls[0][1].body);
+    expect(body.thinking).toEqual({ type: 'disabled' });
+    expect(body.model).toBe('m1');
+  });
+  it('ignores invalid extra body json', async () => {
+    process.env.LLM_EXTRA_BODY = '{oops';
+    const fetchImpl = vi.fn().mockResolvedValue(okResponse('{"a":1}'));
+    await requestJSON({ messages: [{ role: 'user', content: 'q' }], validate: (d) => ({ ok: true, data: d }), fetchImpl });
+    const body = JSON.parse(fetchImpl.mock.calls[0][1].body);
+    expect(body.thinking).toBeUndefined();
+    expect(body.model).toBe('m1');
+  });
+  it('omits extra body when env unset', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(okResponse('{"a":1}'));
+    await requestJSON({ messages: [{ role: 'user', content: 'q' }], validate: (d) => ({ ok: true, data: d }), fetchImpl });
+    const body = JSON.parse(fetchImpl.mock.calls[0][1].body);
+    expect(Object.keys(body).sort()).toEqual(['max_tokens', 'messages', 'model', 'response_format', 'temperature']);
   });
 });

@@ -17,7 +17,16 @@ export function readConfig(env = process.env) {
   const apiKey = env.LLM_API_KEY;
   const model = env.LLM_MODEL || 'gpt-4o-mini';
   if (!apiKey) throw new LLMError('missing_api_key');
-  return { baseUrl, apiKey, model };
+  let extraBody = null;
+  if (env.LLM_EXTRA_BODY) {
+    try {
+      const parsed = JSON.parse(env.LLM_EXTRA_BODY);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) extraBody = parsed;
+    } catch {
+      extraBody = null;
+    }
+  }
+  return { baseUrl, apiKey, model, extraBody };
 }
 
 export function extractJSON(text) {
@@ -37,6 +46,7 @@ async function postChat({ config, messages, maxTokens, timeoutMs, fetchImpl, use
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   const body = { model: config.model, messages, max_tokens: maxTokens, temperature: 0.4 };
   if (useJsonMode) body.response_format = { type: 'json_object' };
+  if (config.extraBody) Object.assign(body, config.extraBody);
   try {
     const res = await fetchImpl(`${config.baseUrl}/chat/completions`, {
       method: 'POST',
@@ -74,7 +84,7 @@ async function postChat({ config, messages, maxTokens, timeoutMs, fetchImpl, use
 export async function requestJSON({
   messages,
   validate,
-  maxTokens = 1200,
+  maxTokens = 2000,
   timeoutMs = 20000,
   env = process.env,
   fetchImpl = fetch,

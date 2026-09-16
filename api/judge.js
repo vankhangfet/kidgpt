@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     const judge = await requestJSON({
       messages: buildJudgeMessages({ question, stepQuestion, childAnswer, lang }),
       validate: validateJudge,
-      maxTokens: 500,
+      maxTokens: 800,
     });
     logLine('judge', { lang, verdict: judge.verdict, latencyMs: Date.now() - started });
     return res.status(200).json({ judge });
