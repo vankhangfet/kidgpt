@@ -1,4 +1,7 @@
 import { CORRECTION_MESSAGE } from './prompts.js';
+import { primeLocalEnv } from './localenv.js';
+
+primeLocalEnv(); // no-op unless running locally with .env.local
 
 export class LLMError extends Error {
   constructor(code, detail) {
