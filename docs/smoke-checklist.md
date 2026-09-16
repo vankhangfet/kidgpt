@@ -1,11 +1,13 @@
 # KidGPT Smoke Checklist (chạy tay trước khi release)
 
-Chuẩn bị: copy `.env.example` → `.env.local`, điền `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`
-(không bắt buộc UPSTASH_*). Chạy `npx vercel dev` và mở URL local.
+Chuẩn bị: `npm install` (lần đầu); copy `.env.example` → `.env.local`, điền `LLM_BASE_URL`,
+`LLM_API_KEY`, `LLM_MODEL` (không bắt buộc UPSTASH_*). Chạy `npx vercel dev` (lần đầu sẽ yêu
+cầu login/link project), mở URL local (mặc định http://localhost:3000).
 
 ## Song ngữ
-- [ ] Mở lần đầu: UI theo ngôn ngữ trình duyệt
-- [ ] Bấm EN/VI: rail, welcome, placeholder, suggest, chip, aria-label đổi toàn bộ
+- [ ] Mở lần đầu (tab ẩn danh hoặc xóa localStorage `kidgpt-lang`): UI theo ngôn ngữ trình duyệt
+- [ ] Bấm EN/VI: rail, tagline, placeholder, suggest, chip, aria-label đổi toàn bộ (các bubble
+      chat đã hiển thị giữ nguyên ngôn ngữ cũ — bấm "Bắt đầu lại" để làm mới)
 - [ ] Hỏi bằng tiếng Việt → AI trả plan tiếng Việt; đổi sang EN, hỏi tiếng Anh → plan tiếng Anh
 
 ## Kế hoạch học
@@ -23,12 +25,15 @@ Chuẩn bị: copy `.env.example` → `.env.local`, điền `LLM_BASE_URL`, `LLM
 
 ## Bền vững
 - [ ] Tắt LLM_API_KEY (env rỗng) → hỏi 2 lần → plan "thám tử" canned hiển thị, không treo
-- [ ] Trả lời vào plan fallback → được coi là câu hỏi mới (không loop lỗi)
+- [ ] Trả lời vào plan fallback: khi API đang tắt → cheer "chưa đọc được" không treo; khi bật lại
+      key + restart `vercel dev` → được coi là câu hỏi mới (không loop lỗi)
 - [ ] Câu > 500 ký tự → vẫn hoạt động (bị truncate phía server)
 - [ ] Spam gửi nhanh (double-tap chip) → không chồng thinking dots, không gọi đúp
 - [ ] Cấu hình UPSTASH → spam >20 request/5 phút → 429 thân thiện KHÔNG nút retry
 - [ ] Response headers có CSP, X-Frame-Options (check DevTools → Network)
-- [ ] Vercel logs: JSON line có lang/outcome/verdict/latencyMs, KHÔNG có nội dung câu hỏi
+- [ ] Vercel logs: chat line có lang/outcome/subject/latencyMs, judge line có lang/verdict/latencyMs — KHÔNG có nội dung câu hỏi
 - [ ] "Bắt đầu lại" → dọn sạch stream, welcome hiện lại; đang chờ API mà bấm reset → response cũ bị bỏ
+- [ ] Offline (DevTools → Network → Offline) → gửi câu hỏi → bubble lỗi + nút "Thử lại" (câu hỏi
+      được giữ trong nút retry, một chạm gửi lại, không treo)
 - [ ] Bàn phím: Tab qua các nút thấy outline focus; Enter gửi, Shift+Enter xuống dòng
 - [ ] Thu nhỏ cửa sổ ~360px: rail scroll ngang 5 chủ đề, composer dùng được
