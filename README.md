@@ -4,6 +4,10 @@ A bilingual (Vietnamese/English) AI study buddy for kids aged 6–12. Sparkle ne
 over the answer — it guides children to find it themselves, one small question at a time,
 with animated visual aids: number blocks, dot groups, letter tiles and step-flow diagrams.
 
+![A guided math walkthrough: number-block visual aids for 25 + 17, step-by-step questions, and the answer still hidden](imgs/image2-kidgpt.png)
+
+![After genuinely trying, the child reveals the answer — complete with an explanation and celebration](imgs/image1-kidgpt.png)
+
 ## Why use it with children?
 
 - **Guides, never tells** — Socratic step-by-step plans keep the child thinking; the final
