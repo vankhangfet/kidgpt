@@ -280,6 +280,7 @@ async function judgeFlow(text) {
     await planFlow(text);
     return;
   }
+  busy = true;
   const step = active.plan.steps[active.revealed - 1];
   const gen = session;
   const think = showThinking();
@@ -299,6 +300,7 @@ async function judgeFlow(text) {
     if (gen !== session) return;
     const judge = data.judge;
     if (judge.verdict === 'new_question') {
+      busy = false;
       think.remove();
       await planFlow(text);
       return;
@@ -314,6 +316,7 @@ async function judgeFlow(text) {
     addCheer(t(lang, 'judgeFail'), 'try');
   } finally {
     think.remove();
+    busy = false;
   }
 }
 
