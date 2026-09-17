@@ -60,6 +60,6 @@ under `docs/`.
 
 1. Create a free Firebase project → Authentication → Sign-in method → enable **Google**
 2. Create a **Firestore** database (production mode)
-3. Register a Web app (Project settings → Your apps), then copy its config into `public/firebase-config.js` (apiKey/authDomain/projectId/appId — public by design)
+3. Register a Web app (Project settings → Your apps), then copy its config into `public/firebase-config.js` (apiKey/authDomain/projectId/appId — public by design). The committed file keeps placeholders; to run locally with your real values without dirtying git: `git update-index --skip-worktree public/firebase-config.js`
 4. Paste the owner-only security rules from `docs/superpowers/specs/2026-09-17-kidgpt-auth-design.md` §4 into Firestore → Rules
 5. Set `FIREBASE_PROJECT_ID` on Vercel; add your deployed domain to Authentication → Settings → Authorized domains
