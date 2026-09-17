@@ -93,3 +93,13 @@ export function sanitizeHistory(history, max = 10) {
     .slice(-max)
     .map((m) => ({ role: m.role, content: sanitizeText(m.content) }));
 }
+
+export const AGE_BANDS = ['6-8', '9-12'];
+
+export function sanitizeProfileName(name) {
+  return sanitizeText(name, 20);
+}
+
+export function normalizeAgeBand(band) {
+  return AGE_BANDS.includes(band) ? band : null;
+}
