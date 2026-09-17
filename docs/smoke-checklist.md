@@ -4,6 +4,23 @@ Chuẩn bị: `npm install` (lần đầu); copy `.env.example` → `.env.local`
 `LLM_API_KEY`, `LLM_MODEL` (không bắt buộc UPSTASH_*). Chạy `npx vercel dev` (lần đầu sẽ yêu
 cầu login/link project), mở URL local (mặc định http://localhost:3000).
 
+## Đăng nhập & hồ sơ (cần Firebase cấu hình + FIREBASE_PROJECT_ID)
+- [ ] Mở app chưa login → màn login với nút Google; chat phía sau không bấm được (overlay + inert)
+- [ ] Đăng nhập Google → (lần đầu) màn tạo hồ sơ; tạo "Bé Bi" khổ 6–8 → sang màn chọn hồ sơ
+- [ ] Chọn hồ sơ → vào chat; header hiện chip 👋 tên bé
+- [ ] Hỏi "25 + 17 = ?" ở hồ sơ 6–8 → câu chữ đơn giản hơn hồ sơ 9–12 (so sánh 2 hồ sơ)
+- [ ] Bấm chip tên → đổi hồ sơ khác → phiên chat reset, không lẫn nội dung cũ
+- [ ] Quản lý hồ sơ: sửa tên, xóa hồ sơ, tạo tới 5 thì chặn (Tối đa 5 hồ sơ)
+- [ ] Logout → mở lại app → còn session, vào thẳng màn chọn hồ sơ
+- [ ] Đăng nhập trên Safari iOS (iPhone/iPad thật): popup Google hoạt động — nếu thất bại
+      bấm lại nút phải thấy thông báo lỗi (không im lặng)
+- [ ] DevTools Console: KHÔNG có lỗi CSP violation trong lúc login + đọc Firestore lần đầu
+- [ ] Tắt FIREBASE_PROJECT_ID trên server → API trả 500 not_configured
+- [ ] Gọi API không token → 401; app hiện lại màn gate
+- [ ] Server FIREBASE_PROJECT_ID ≠ projectId client → mọi câu hỏi 401 liên tục về màn
+      chọn hồ sơ (misconfig — kiểm tra 2 giá trị khớp nhau)
+- [ ] Đăng nhập lại cùng hồ sơ → phiên chat cũ quay lại (hành vi chủ đích)
+
 ## Song ngữ
 - [ ] Mở lần đầu (tab ẩn danh hoặc xóa localStorage `kidgpt-lang`): UI theo ngôn ngữ trình duyệt
 - [ ] Bấm EN/VI: rail, tagline, placeholder, suggest, chip, aria-label đổi toàn bộ (các bubble

@@ -14,9 +14,9 @@ with animated visual aids: number blocks, dot groups, letter tiles and step-flow
   answer stays hidden behind an explicit "I tried — reveal the answer" button
 - **Built for young readers** — short sentences, a warm tutor voice, cheerful visuals for
   math, spelling and science, and legacy-browser fallbacks so old family tablets still work
-- **Safe by design** — school topics only with kind refusals for anything else, hardened
-  prompts that ignore "just tell me the answer" tricks, strictly validated AI output,
-  and zero stored personal data (no accounts, no server-side chat history)
+- **Parent-unlocked** — a parent signs in once with Google (Firebase Auth, the device stays
+  signed in); each child gets their own profile, and the AI adapts to the 6–8 or 9–12 age
+  band. Only a nickname and age band are stored — never chat history
 - **Bring your own AI** — works with any OpenAI-compatible endpoint (OpenAI, z.ai GLM,
   Ollama…) configured purely through environment variables
 
@@ -36,6 +36,7 @@ npx vercel dev               # open http://localhost:3000
 | `LLM_API_KEY` | ✓ | Gateway API key |
 | `LLM_MODEL` | ✓ | Model name, e.g. `gpt-4o-mini` |
 | `LLM_EXTRA_BODY` | – | JSON merged into the request body, e.g. `{"thinking":{"type":"disabled"}}` on z.ai for 2–3× faster replies |
+| `FIREBASE_PROJECT_ID` | ✓ (with login) | Firebase project id for ID-token verification |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | – | Enables 20 req/5 min/IP/endpoint rate limiting (skipped when unset) |
 
 ## Tests
@@ -50,3 +51,11 @@ Import the repo (preset "Other") — `public/` is served statically and `api/` b
 Serverless Functions. Set the environment variables in Project Settings. Security headers
 live in `vercel.json`. Design spec, implementation plan and the manual QA checklist are
 under `docs/`.
+
+## Firebase setup (login + profiles)
+
+1. Create a free Firebase project → Authentication → Sign-in method → enable **Google**
+2. Create a **Firestore** database (production mode)
+3. Copy your web app config into `public/firebase-config.js` (apiKey/authDomain/projectId/appId — public by design)
+4. Paste the owner-only security rules from `docs/superpowers/specs/2026-09-17-kidgpt-auth-design.md` §4 into Firestore → Rules
+5. Set `FIREBASE_PROJECT_ID` on Vercel; add your deployed domain to Authentication → Settings → Authorized domains
