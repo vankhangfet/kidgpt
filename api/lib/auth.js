@@ -1,4 +1,5 @@
 import { createRemoteJWKSet, jwtVerify } from 'jose';
+import { logLine } from './log.js';
 
 const JWKS_URL = 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com';
 
@@ -29,14 +30,25 @@ async function defaultVerify(token, projectId) {
   const { payload } = await jwtVerify(token, getJwks(), {
     issuer: `https://securetoken.google.com/${projectId}`,
     audience: projectId,
+    algorithms: ['RS256'],
+    requiredClaims: ['exp'],
   });
-  if (!payload || !payload.sub) throw new AuthError('unauthorized');
+  if (!payload.sub) throw new AuthError('unauthorized');
   return { uid: payload.sub };
 }
 
+// Token-validation failures mean "this credential is bad" (401).
+// Anything else (JWKS fetch timeout, network error, 5xx from Google...)
+// means "we could not check" — surfaced as auth_unavailable (503).
+const TOKEN_ERRORS = new Set([
+  'JWTExpired', 'JWTClaimValidationFailed', 'JWSSignatureVerificationFailed',
+  'JWSInvalid', 'JWTInvalid', 'JWTMalformed', 'JWKSNoMatchingKey',
+  'JWKSMultipleMatchingKeys', 'JOSEAlgNotAllowed', 'JOSENotSupported',
+]);
+
 /**
  * Verify a Firebase ID token. `verifyImpl` is injectable for tests.
- * Returns {uid} or throws AuthError('unauthorized'|'not_configured').
+ * Returns {uid} or throws AuthError('unauthorized'|'auth_unavailable'|'not_configured').
  */
 export async function requireAuth(req, verifyImpl = defaultVerify) {
   const projectId = process.env.FIREBASE_PROJECT_ID;
@@ -47,6 +59,9 @@ export async function requireAuth(req, verifyImpl = defaultVerify) {
     return await verifyImpl(token, projectId);
   } catch (err) {
     if (err instanceof AuthError) throw err;
-    throw new AuthError('unauthorized');
+    const name = (err && err.name) || 'unknown';
+    logLine('auth_rejected', { error: name });
+    if (TOKEN_ERRORS.has(name)) throw new AuthError('unauthorized');
+    throw new AuthError('auth_unavailable');
   }
 }
