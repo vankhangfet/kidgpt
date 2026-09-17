@@ -32,9 +32,25 @@ export function reopenGate() {
 }
 
 async function route() {
-  const profiles = await listProfiles(currentUser.uid);
-  if (!profiles.length) renderManager(profiles, true);
-  else renderPicker(profiles);
+  if (!currentUser) { renderLogin(); return; }
+  try {
+    const profiles = await listProfiles(currentUser.uid);
+    if (!profiles.length) renderManager(profiles, true);
+    else renderPicker(profiles);
+  } catch (e) {
+    renderLoadError();
+  }
+}
+
+function renderLoadError() {
+  const lang = currentLang();
+  show(
+    '<div class="gate-card">' +
+      '<h2 class="gate-title">😞</h2>' +
+      '<p class="gate-body">' + esc(t(lang, 'actionError')) + '</p>' +
+      '<div class="gate-actions"><button class="btn-ghost" id="gate-retry" type="button">' + esc(t(lang, 'retry')) + '</button></div>' +
+    '</div>');
+  document.getElementById('gate-retry').addEventListener('click', () => route());
 }
 
 function renderConfigError() {
@@ -73,7 +89,7 @@ function renderLogin() {
 }
 
 function profileCard(p, lang) {
-  const color = PROFILE_COLORS[p.color % 8];
+  const color = PROFILE_COLORS[p.color % 8] || PROFILE_COLORS[0];
   const initials = esc(String(p.name || '?').trim().slice(0, 2).toUpperCase() || '?');
   return '<button class="profile-card" type="button" data-id="' + esc(p.id) + '" style="--pc:' + color + '">' +
     '<span class="profile-avatar" aria-hidden="true">' + initials + '</span>' +
@@ -97,9 +113,9 @@ function renderPicker(profiles) {
   gateEl.querySelectorAll('.profile-card').forEach((card) => {
     card.addEventListener('click', () => {
       const p = profiles.find((x) => x.id === card.dataset.id);
-      localStorage.setItem('kidgpt-profile:' + currentUser.uid, p.id);
+      try { localStorage.setItem('kidgpt-profile:' + currentUser.uid, p.id); } catch (e) { /* private mode */ }
+      if (onUnlock) onUnlock(p);
       hide();
-      onUnlock(p);
     });
   });
   document.getElementById('gate-manage').addEventListener('click', async () => {
@@ -126,7 +142,7 @@ function renderManager(profiles, firstTime, errorMsg) {
       '<h2 class="gate-title">' + esc(t(lang, firstTime ? 'addProfile' : 'manageProfiles')) + '</h2>' +
       (profiles.length
         ? '<div class="profile-list">' + profiles.map((p) =>
-            '<div class="profile-row" style="--pc:' + PROFILE_COLORS[p.color % 8] + '">' +
+            '<div class="profile-row" style="--pc:' + (PROFILE_COLORS[p.color % 8] || PROFILE_COLORS[0]) + '">' +
               '<span class="profile-row-name">' + esc(p.name) + '</span>' +
               '<span class="profile-row-band">' + esc(t(lang, p.ageBand === '6-8' ? 'ageBand6to8' : 'ageBand9to12')) + '</span>' +
               '<button class="chip" data-edit="' + esc(p.id) + '" type="button">' + esc(t(lang, 'editProfile')) + '</button>' +
@@ -167,7 +183,9 @@ function renderManager(profiles, firstTime, errorMsg) {
       errEl.hidden = true;
       const name = (gateEl.querySelector('#gate-name').value || '').trim();
       if (!name) return;
-      try {
+        const saveBtn = form.querySelector('.gate-save');
+        saveBtn.disabled = true;
+        try {
         if (editingId) {
           await updateProfile(currentUser.uid, editingId, { name, ageBand: band });
         } else {
@@ -177,6 +195,7 @@ function renderManager(profiles, firstTime, errorMsg) {
       } catch (err2) {
         errEl.textContent = t(lang, 'actionError');
         errEl.hidden = false;
+        saveBtn.disabled = false;
       }
     });
   }
@@ -211,8 +230,14 @@ function renderManager(profiles, firstTime, errorMsg) {
 function show(html) {
   gateEl.innerHTML = html;
   gateEl.hidden = false;
+  const app = document.querySelector('.app');
+  if (app && 'inert' in app) app.inert = true;
+  const first = gateEl.querySelector('button');
+  if (first) first.focus();
 }
 function hide() {
   gateEl.hidden = true;
   gateEl.innerHTML = '';
+  const app = document.querySelector('.app');
+  if (app && 'inert' in app) app.inert = false;
 }
