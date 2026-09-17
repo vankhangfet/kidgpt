@@ -82,23 +82,32 @@ users/{uid}/profiles/{profileId}
 ```
 
 - CRUD hoàn toàn phía client (Firebase SDK); tối đa 5 hồ sơ/phụ huynh (check client)
-- Security Rules (paste vào Firebase Console):
+- Security Rules (paste vào Firebase Console — LƯU Ý: read/delete phải tách khỏi create/update
+  vì `request.resource` chỉ tồn tại khi ghi; gộp chung sẽ làm mọi read/delete bị từ chối):
 
 ```
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{uid}/profiles/{profileId} {
-      allow read, write: if request.auth != null
-        && request.auth.uid == uid
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name', 'ageBand', 'color', 'createdAt'])
         && request.resource.data.name is string
         && request.resource.data.name.size() > 0
         && request.resource.data.name.size() <= 20
-        && request.resource.data.ageBand in ['6-8', '9-12'];
+        && request.resource.data.ageBand in ['6-8', '9-12']
+        && request.resource.data.color is int
+        && request.resource.data.color >= 0
+        && request.resource.data.color <= 7
+        && request.resource.data.createdAt is timestamp;
     }
   }
 }
 ```
+
+(hasOnly ép đủ đúng 4 field — chống ghi field lạ và chống tài liệu thiếu `createdAt` bị
+loại khỏi kết quả orderBy; color bound 0–7 khớp client.)
 
 - Server không đọc Firestore: client gửi `ageBand`/`profileName` trong body; backend
   sanitize + enum-check (chỉ ảnh hưởng prompt của chính họ)

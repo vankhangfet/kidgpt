@@ -45,7 +45,12 @@ export function watchAuth(cb) {
 
 export async function getAuthToken() {
   init();
-  return authInst.currentUser ? authInst.currentUser.getIdToken() : null;
+  if (!authInst.currentUser) return null;
+  try {
+    return await authInst.currentUser.getIdToken();
+  } catch {
+    return null;
+  }
 }
 
 function profilesRef(uid) {
