@@ -13,6 +13,9 @@ function mockRes() {
 let handler;
 beforeEach(async () => {
   vi.resetModules();
+  vi.doMock('../api/lib/auth.js', () => ({
+    requireAuth: async () => ({ uid: 'u-test' }),
+  }));
   process.env.LLM_BASE_URL = 'http://llm.test/v1';
   process.env.LLM_API_KEY = 'k';
   process.env.LLM_MODEL = 'm1';
@@ -76,6 +79,9 @@ describe('POST /api/judge', () => {
 
   it('returns 429 when rate limit denies', async () => {
     vi.resetModules();
+    vi.doMock('../api/lib/auth.js', () => ({
+      requireAuth: async () => ({ uid: 'u-429' }),
+    }));
     let limitArgs = null;
     vi.doMock('../api/lib/ratelimit.js', () => ({
       createLimiter: () => ({}),
@@ -105,5 +111,62 @@ describe('POST /api/judge', () => {
     await handler({ method: 'POST', body: { question: 'Q', stepQuestion: 'S', childAnswer: 'A' }, headers: {} }, res);
     expect(res.code).toBe(500);
     expect(res.body.error).toBe('not_configured');
+  });
+
+  it('returns 401 when auth rejects', async () => {
+    vi.resetModules();
+    vi.doMock('../api/lib/auth.js', () => ({
+      requireAuth: async () => { const e = new Error('x'); e.code = 'unauthorized'; throw e; },
+    }));
+    const h = (await import('../api/judge.js')).default;
+    const res = mockRes();
+    await h({ method: 'POST', body: { question: 'Q', stepQuestion: 'S', childAnswer: 'A' }, headers: {} }, res);
+    expect(res.code).toBe(401);
+    expect(res.body.error).toBe('unauthorized');
+  });
+
+  it('returns 503 when auth is unavailable', async () => {
+    vi.resetModules();
+    vi.doMock('../api/lib/auth.js', () => ({
+      requireAuth: async () => { const e = new Error('x'); e.code = 'auth_unavailable'; throw e; },
+    }));
+    const h = (await import('../api/judge.js')).default;
+    const res = mockRes();
+    await h({ method: 'POST', body: { question: 'Q', stepQuestion: 'S', childAnswer: 'A' }, headers: {} }, res);
+    expect(res.code).toBe(503);
+    expect(res.body.error).toBe('auth_unavailable');
+  });
+
+  it('rate limits by uid', async () => {
+    vi.resetModules();
+    let limitArgs = null;
+    vi.doMock('../api/lib/auth.js', () => ({ requireAuth: async () => ({ uid: 'u9' }) }));
+    vi.doMock('../api/lib/ratelimit.js', () => ({
+      createLimiter: () => ({}),
+      checkRateLimit: async (...a) => { limitArgs = a; return { success: true, skipped: true }; },
+      clientIp: () => '1.2.3.4',
+    }));
+    const h = (await import('../api/judge.js')).default;
+    vi.doUnmock('../api/lib/ratelimit.js');
+    vi.doUnmock('../api/lib/auth.js');
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true, status: 200,
+      json: async () => ({ choices: [{ message: { content: JSON.stringify(okJudge) } }] }),
+    }));
+    await h({ method: 'POST', body: { question: 'Q', stepQuestion: 'S', childAnswer: 'A' }, headers: { authorization: 'Bearer t' } }, mockRes());
+    expect(limitArgs[1]).toBe('u9');
+    expect(limitArgs[2]).toBe('judge');
+  });
+
+  it('maps unknown auth error codes to 401', async () => {
+    vi.resetModules();
+    vi.doMock('../api/lib/auth.js', () => ({
+      requireAuth: async () => { const e = new Error('x'); e.code = 'whargarbl'; throw e; },
+    }));
+    const h = (await import('../api/judge.js')).default;
+    const res = mockRes();
+    await h({ method: 'POST', body: { question: 'Q', stepQuestion: 'S', childAnswer: 'A' }, headers: {} }, res);
+    expect(res.code).toBe(401);
+    expect(res.body.error).toBe('unauthorized');
   });
 });

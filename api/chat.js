@@ -1,8 +1,9 @@
-import { sanitizeText, sanitizeHistory, validatePlan, SUBJECTS } from './lib/schemas.js';
+import { sanitizeText, sanitizeHistory, validatePlan, SUBJECTS, sanitizeProfileName, normalizeAgeBand } from './lib/schemas.js';
 import { buildChatMessages } from './lib/prompts.js';
 import { requestJSON, LLMError } from './lib/llm.js';
-import { createLimiter, checkRateLimit, clientIp } from './lib/ratelimit.js';
+import { createLimiter, checkRateLimit } from './lib/ratelimit.js';
 import { logLine } from './lib/log.js';
+import { requireAuth } from './lib/auth.js';
 
 const limiter = createLimiter();
 
@@ -13,7 +14,21 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'method_not_allowed' });
   }
 
-  const limit = await checkRateLimit(limiter, clientIp(req), 'chat');
+  let auth;
+  try {
+    auth = await requireAuth(req);
+  } catch (err) {
+    const code = err && err.code;
+    if (code === 'not_configured') {
+      return res.status(500).json({ error: 'not_configured' });
+    }
+    if (code === 'auth_unavailable') {
+      return res.status(503).json({ error: 'auth_unavailable' });
+    }
+    return res.status(401).json({ error: 'unauthorized' });
+  }
+
+  const limit = await checkRateLimit(limiter, auth.uid, 'chat');
   if (!limit.success) {
     logLine('chat_ratelimited', {});
     return res.status(429).json({ error: 'rate_limited' });
@@ -25,17 +40,20 @@ export default async function handler(req, res) {
   const history = sanitizeHistory(body.history);
   const lang = body.lang === 'en' ? 'en' : 'vi';
   const subject = SUBJECTS.includes(body.subject) ? body.subject : null;
+  const profileName = sanitizeProfileName(body.profileName) || null;
+  const ageBand = normalizeAgeBand(body.ageBand);
 
   const started = Date.now();
   try {
     const plan = await requestJSON({
-      messages: buildChatMessages({ message, history, subject, lang }),
+      messages: buildChatMessages({ message, history, subject, lang, profileName, ageBand }),
       validate: validatePlan,
     });
     logLine('chat', {
       lang,
       outcome: plan.type,
       subject: plan.type === 'plan' ? plan.subject : null,
+      ageBand: ageBand || null,
       latencyMs: Date.now() - started,
     });
     return res.status(200).json({ plan });

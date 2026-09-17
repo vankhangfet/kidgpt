@@ -1,8 +1,9 @@
 import { sanitizeText, validateJudge } from './lib/schemas.js';
 import { buildJudgeMessages } from './lib/prompts.js';
 import { requestJSON, LLMError } from './lib/llm.js';
-import { createLimiter, checkRateLimit, clientIp } from './lib/ratelimit.js';
+import { createLimiter, checkRateLimit } from './lib/ratelimit.js';
 import { logLine } from './lib/log.js';
+import { requireAuth } from './lib/auth.js';
 
 const limiter = createLimiter();
 
@@ -13,7 +14,21 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'method_not_allowed' });
   }
 
-  const limit = await checkRateLimit(limiter, clientIp(req), 'judge');
+  let auth;
+  try {
+    auth = await requireAuth(req);
+  } catch (err) {
+    const code = err && err.code;
+    if (code === 'not_configured') {
+      return res.status(500).json({ error: 'not_configured' });
+    }
+    if (code === 'auth_unavailable') {
+      return res.status(503).json({ error: 'auth_unavailable' });
+    }
+    return res.status(401).json({ error: 'unauthorized' });
+  }
+
+  const limit = await checkRateLimit(limiter, auth.uid, 'judge');
   if (!limit.success) {
     logLine('judge_ratelimited', {});
     return res.status(429).json({ error: 'rate_limited' });

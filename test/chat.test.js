@@ -34,6 +34,9 @@ beforeEach(async () => {
   process.env.LLM_API_KEY = 'k';
   process.env.LLM_MODEL = 'm1';
   delete process.env.UPSTASH_REDIS_REST_URL;
+  vi.doMock('../api/lib/auth.js', () => ({
+    requireAuth: async () => ({ uid: 'u-test' }),
+  }));
   handler = (await import('../api/chat.js')).default;
 });
 afterEach(() => vi.unstubAllGlobals());
@@ -123,11 +126,83 @@ describe('POST /api/chat', () => {
     expect(res.code).toBe(500);
     expect(res.body.error).toBe('not_configured');
   });
+
+  it('returns 401 when auth rejects', async () => {
+    vi.resetModules();
+    vi.doMock('../api/lib/auth.js', () => ({
+      requireAuth: async () => { const e = new Error('x'); e.code = 'unauthorized'; throw e; },
+    }));
+    const h = (await import('../api/chat.js')).default;
+    const res = mockRes();
+    await h({ method: 'POST', body: { message: 'q' }, headers: {} }, res);
+    expect(res.code).toBe(401);
+    expect(res.body.error).toBe('unauthorized');
+  });
+
+  it('returns 503 when auth is unavailable', async () => {
+    vi.resetModules();
+    vi.doMock('../api/lib/auth.js', () => ({
+      requireAuth: async () => { const e = new Error('x'); e.code = 'auth_unavailable'; throw e; },
+    }));
+    const h = (await import('../api/chat.js')).default;
+    const res = mockRes();
+    await h({ method: 'POST', body: { message: 'q' }, headers: {} }, res);
+    expect(res.code).toBe(503);
+    expect(res.body.error).toBe('auth_unavailable');
+  });
+
+  it('authenticates, rate limits by uid and passes profile to the prompt', async () => {
+    vi.resetModules();
+    let limitArgs = null;
+    vi.doMock('../api/lib/auth.js', () => ({
+      requireAuth: async () => ({ uid: 'u1' }),
+    }));
+    vi.doMock('../api/lib/ratelimit.js', () => ({
+      createLimiter: () => ({}),
+      checkRateLimit: async (...a) => { limitArgs = a; return { success: true, skipped: true }; },
+      clientIp: () => '1.2.3.4',
+    }));
+    const spy = vi.fn().mockResolvedValue({
+      ok: true, status: 200,
+      json: async () => ({ choices: [{ message: { content: JSON.stringify(validPlan) } }] }),
+    });
+    vi.stubGlobal('fetch', spy);
+    const h = (await import('../api/chat.js')).default;
+    vi.doUnmock('../api/lib/ratelimit.js');
+    vi.doUnmock('../api/lib/auth.js');
+    const res = mockRes();
+    await h({
+      method: 'POST',
+      body: { message: '25 + 17?', lang: 'vi', profileName: '<b>Bé</b>\nBi', ageBand: '6-8' },
+      headers: { authorization: 'Bearer tok' },
+    }, res);
+    expect(res.code).toBe(200);
+    expect(limitArgs[1]).toBe('u1');
+    expect(limitArgs[2]).toBe('chat');
+    const body = JSON.parse(spy.mock.calls[0][1].body);
+    expect(body.messages[0].content).toContain('6–8 tuổi');
+    expect(body.messages.at(-1).content).toContain('(Trẻ: Bé Bi, khổ tuổi: 6-8)');
+  });
+
+  it('maps unknown auth error codes to 401', async () => {
+    vi.resetModules();
+    vi.doMock('../api/lib/auth.js', () => ({
+      requireAuth: async () => { const e = new Error('x'); e.code = 'whargarbl'; throw e; },
+    }));
+    const h = (await import('../api/chat.js')).default;
+    const res = mockRes();
+    await h({ method: 'POST', body: { message: 'q' }, headers: {} }, res);
+    expect(res.code).toBe(401);
+    expect(res.body.error).toBe('unauthorized');
+  });
 });
 
 describe('POST /api/chat rate limit', () => {
   it('returns 429 when rate limit denies', async () => {
     vi.resetModules();
+    vi.doMock('../api/lib/auth.js', () => ({
+      requireAuth: async () => ({ uid: 'u-429' }),
+    }));
     vi.doMock('../api/lib/ratelimit.js', () => ({
       createLimiter: () => ({}),
       checkRateLimit: async () => ({ success: false, skipped: false }),

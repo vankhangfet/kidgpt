@@ -90,4 +90,51 @@ describe('prompt hardening', () => {
     expect(msgs.length).toBe(3);
     expect(msgs.filter((m) => m.role === 'system').length).toBe(1);
   });
+  it('treats en-dash band as unknown (hyphen-only contract)', () => {
+    expect(buildSystemPrompt('vi', '6–8')).toBe(buildSystemPrompt('vi'));
+    expect(buildSystemPrompt('vi', '3-5')).toBe(buildSystemPrompt('vi'));
+  });
+  it('places the band block after the base rules', () => {
+    const vi = buildSystemPrompt('vi', '6-8');
+    expect(vi.indexOf('QUY TẮC SƯ PHẠM')).toBeLessThan(vi.indexOf('6–8 tuổi'));
+  });
+  it('omits the profile suffix when either name or band is missing', () => {
+    const nameOnly = buildChatMessages({ message: 'q', history: [], lang: 'vi', profileName: 'Bi', ageBand: null });
+    const bandOnly = buildChatMessages({ message: 'q', history: [], lang: 'vi', profileName: '', ageBand: '6-8' });
+    expect(nameOnly.at(-1).content).toBe('q');
+    expect(bandOnly.at(-1).content).toBe('q');
+  });
+});
+
+describe('age band adaptation', () => {
+  it('appends young-band rules for 6-8 in both langs', () => {
+    const vi = buildSystemPrompt('vi', '6-8');
+    const en = buildSystemPrompt('en', '6-8');
+    expect(vi).toContain('6–8 tuổi');
+    expect(vi).toContain('Socratic');
+    expect(en).toContain('ages 6–8');
+    expect(en).toContain('Socratic');
+  });
+  it('keeps base prompt for 9-12 or missing band', () => {
+    expect(buildSystemPrompt('vi', '9-12')).toBe(buildSystemPrompt('vi'));
+    expect(buildSystemPrompt('vi')).toBe(buildSystemPrompt('vi'));
+  });
+});
+
+describe('profile suffix in chat messages', () => {
+  it('appends child name and age band as a separate note', () => {
+    const msgs = buildChatMessages({
+      message: 'q', history: [], subject: 'math', lang: 'vi',
+      profileName: 'Bé Bi', ageBand: '6-8',
+    });
+    const content = msgs.at(-1).content;
+    expect(content).toContain('(Chủ đề: math)');
+    expect(content).toContain('(Trẻ: Bé Bi, khổ tuổi: 6-8)');
+  });
+  it('english suffix and no suffix when absent', () => {
+    const msgs = buildChatMessages({ message: 'q', history: [], subject: null, lang: 'en', profileName: 'Minh', ageBand: '9-12' });
+    expect(msgs.at(-1).content).toContain('(Child: Minh, age band: 9-12)');
+    const none = buildChatMessages({ message: 'q', history: [], lang: 'vi' });
+    expect(none.at(-1).content).toBe('q');
+  });
 });
