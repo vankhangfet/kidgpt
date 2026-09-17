@@ -157,4 +157,16 @@ describe('POST /api/judge', () => {
     expect(limitArgs[1]).toBe('u9');
     expect(limitArgs[2]).toBe('judge');
   });
+
+  it('maps unknown auth error codes to 401', async () => {
+    vi.resetModules();
+    vi.doMock('../api/lib/auth.js', () => ({
+      requireAuth: async () => { const e = new Error('x'); e.code = 'whargarbl'; throw e; },
+    }));
+    const h = (await import('../api/judge.js')).default;
+    const res = mockRes();
+    await h({ method: 'POST', body: { question: 'Q', stepQuestion: 'S', childAnswer: 'A' }, headers: {} }, res);
+    expect(res.code).toBe(401);
+    expect(res.body.error).toBe('unauthorized');
+  });
 });

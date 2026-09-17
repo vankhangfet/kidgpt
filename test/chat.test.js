@@ -183,6 +183,18 @@ describe('POST /api/chat', () => {
     expect(body.messages[0].content).toContain('6–8 tuổi');
     expect(body.messages.at(-1).content).toContain('(Trẻ: Bé Bi, khổ tuổi: 6-8)');
   });
+
+  it('maps unknown auth error codes to 401', async () => {
+    vi.resetModules();
+    vi.doMock('../api/lib/auth.js', () => ({
+      requireAuth: async () => { const e = new Error('x'); e.code = 'whargarbl'; throw e; },
+    }));
+    const h = (await import('../api/chat.js')).default;
+    const res = mockRes();
+    await h({ method: 'POST', body: { message: 'q' }, headers: {} }, res);
+    expect(res.code).toBe(401);
+    expect(res.body.error).toBe('unauthorized');
+  });
 });
 
 describe('POST /api/chat rate limit', () => {
