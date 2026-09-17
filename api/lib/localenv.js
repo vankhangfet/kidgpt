@@ -21,7 +21,7 @@ export function applyLocalEnv(env, text) {
 
 /** Prime process.env from .env.local once, only when no key is configured. */
 export function primeLocalEnv() {
-  if (process.env.LLM_API_KEY) return;
+  if (process.env.LLM_API_KEY && process.env.FIREBASE_PROJECT_ID) return;
   let text;
   try {
     text = readFileSync('.env.local', 'utf8');

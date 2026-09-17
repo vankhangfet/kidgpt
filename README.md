@@ -41,7 +41,7 @@ npx vercel dev               # open http://localhost:3000
 | `LLM_MODEL` | ✓ | Model name, e.g. `gpt-4o-mini` |
 | `LLM_EXTRA_BODY` | – | JSON merged into the request body, e.g. `{"thinking":{"type":"disabled"}}` on z.ai for 2–3× faster replies |
 | `FIREBASE_PROJECT_ID` | ✓ (with login) | Firebase project id for ID-token verification |
-| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | – | Enables 20 req/5 min/IP/endpoint rate limiting (skipped when unset) |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | – | Enables 20 req/5 min/account/endpoint rate limiting (skipped when unset) |
 
 ## Tests
 

@@ -64,8 +64,8 @@ Mở app (Firebase Auth session tự phục hồi từ IndexedDB)
      strip HTML như sanitizeText) → nối vào prompt theo kiểu "(Trẻ: {tên}, khổ tuổi {band})";
      log KHÔNG chứa tên
 5. **CSP** (vercel.json): `script-src` thêm `https://www.gstatic.com`; `connect-src` thêm
-   `https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com`; thêm
-   `frame-src 'self' https://accounts.google.com`
+   `https://*.googleapis.com wss://*.googleapis.com`; `frame-src`
+   `https://accounts.google.com https://*.firebaseapp.com` (auth iframe relay)
 6. Dependency server mới: `jose` (thuần verify + fetch JWKS 1 lần/cache). KHÔNG firebase-admin,
    KHÔNG service account trên server — env duy nhất: `FIREBASE_PROJECT_ID`
 
@@ -122,10 +122,11 @@ dùng design system hiện tại (Baloo/Nunito, coral/teal, pill, rise), i18n vi
 2. **Màn quản lý hồ sơ** (phụ huynh): danh sách hồ sơ (sửa/xóa) + form tạo (tên + 2 nút khổ tuổi) + lưu
 3. **Màn chọn hồ sơ** (trẻ): thẻ to màu avatar + tên + khổ tuổi; bấm vào vào chat;
    `activeProfileId` lưu localStorage theo uid (`kidgpt-profile:{uid}`)
+   (dự phòng auto-resume v2; v1 luôn hiện màn chọn)
 4. **Header chat**: chip `👋 {tên bé}` (bấm → đổi hồ sơ), nút logout (icon, aria-label i18n)
 
 Thay đổi app.js: state thêm `user`, `profile`; fetch kèm Bearer; 401 → màn login;
-đổi hồ sơ = reset phiên; xóa hồ sơ đang chọn → về màn chọn.
+đổi hồ sơ = reset phiên; xóa hồ sơ xong ở lại màn quản lý (không tự về màn chọn).
 
 ## 6. Bảo mật & quyền riêng tư
 

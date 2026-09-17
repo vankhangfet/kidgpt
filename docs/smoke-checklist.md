@@ -20,6 +20,7 @@ cầu login/link project), mở URL local (mặc định http://localhost:3000).
 - [ ] Server FIREBASE_PROJECT_ID ≠ projectId client → mọi câu hỏi 401 liên tục về màn
       chọn hồ sơ (misconfig — kiểm tra 2 giá trị khớp nhau)
 - [ ] Đăng nhập lại cùng hồ sơ (cùng tab, không reload) → phiên chat cũ còn nguyên (hành vi chủ đích; lịch sử không lưu ở đâu — đóng tab là mất)
+- [ ] Firestore Console → Rules Playground: mô phỏng get users/{uid-khác}/profiles bị từ chối (rules owner-only hoạt động)
 
 ## Song ngữ
 - [ ] Mở lần đầu (tab ẩn danh hoặc xóa localStorage `kidgpt-lang`): UI theo ngôn ngữ trình duyệt
