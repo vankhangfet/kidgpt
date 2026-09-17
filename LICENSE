@@ -1,0 +1,310 @@
+# KidGPT Source-Available Commercial License
+
+**Version 1.0 — September 2026**
+
+Copyright (c) 2026 KidGPT Project / vankhangfet
+
+All rights reserved except for the permissions expressly granted below.
+
+KidGPT ("Software", "KidGPT", "Sparkle Tutor", or "the Project") is a bilingual Vietnamese/English AI study buddy designed for children aged 6–12.
+
+This license applies to the source code of the KidGPT repository, including the frontend, backend/API code, configuration, documentation, and other original materials contained in this repository, unless a file or component is explicitly identified as being subject to a different license.
+
+---
+
+## 1. Grant of Rights
+
+Subject to the terms of this License, the copyright holder grants you a limited, non-exclusive, non-transferable, royalty-free license to:
+
+* View and inspect the source code.
+* Download and copy the source code.
+* Modify the source code.
+* Create derivative works for permitted uses.
+* Run the Software for personal, educational, research, evaluation, testing, and other non-commercial purposes.
+* Self-host the Software for permitted non-commercial purposes.
+* Share copies or modified versions of the Software for permitted non-commercial purposes, provided that this License and the copyright notice are retained.
+
+These permissions do not transfer ownership of the Software.
+
+---
+
+## 2. Non-Commercial Use
+
+You may use, modify, deploy, and self-host KidGPT free of charge for:
+
+* Personal use.
+* Hobby projects.
+* Educational use.
+* Academic or research purposes.
+* Demonstrations and experiments.
+* Non-profit activities that do not generate commercial revenue.
+* Internal evaluation and testing that is not part of a commercial offering.
+
+For the avoidance of doubt, non-commercial use does not include using KidGPT as part of a commercial product, service, business operation, paid deployment, or revenue-generating activity.
+
+---
+
+## 3. Commercial Use
+
+A **Commercial Use** requires a separate written commercial license from the copyright holder.
+
+Commercial Use includes, but is not limited to:
+
+1. Using KidGPT as part of a business, commercial product, or commercial service.
+2. Using KidGPT to provide paid services to customers or third parties.
+3. Deploying KidGPT as a production system for a commercial organization.
+4. Offering KidGPT or a substantially similar derivative work as a hosted service, SaaS, PaaS, or managed service.
+5. Charging users for access to KidGPT or a derivative work.
+6. Using KidGPT to generate revenue, directly or indirectly.
+7. Incorporating KidGPT into another commercial software product.
+8. Providing KidGPT as part of a paid consulting, implementation, support, or managed-service offering.
+9. Reselling, sublicensing, white-labeling, or redistributing KidGPT as a commercial product.
+10. Operating a multi-tenant or customer-facing deployment of KidGPT for commercial purposes.
+11. Using KidGPT to build or operate a competing commercial service.
+12. Offering a hosted or modified version of KidGPT to third parties for a fee.
+
+A Commercial License may be obtained by contacting the copyright holder.
+
+**Commercial licensing terms, pricing, user limits, deployment rights, support terms, and other conditions are determined separately by written agreement.**
+
+---
+
+## 4. Internal Commercial Use
+
+If a company or organization wants to deploy KidGPT internally for its employees, customers, students, or other users as part of its normal business operations, such deployment is considered Commercial Use and requires a Commercial License.
+
+This applies even when the organization does not directly charge users for access to KidGPT.
+
+For example:
+
+* A company deploying KidGPT internally for employee training → Commercial Use.
+* A school using KidGPT as part of a paid educational service → Commercial Use.
+* A business deploying KidGPT for customers → Commercial Use.
+* A company self-hosting KidGPT on AWS, Azure, GCP, or another cloud provider for business operations → Commercial Use.
+
+---
+
+## 5. Hosted Services and SaaS
+
+You may not use KidGPT or a derivative work to operate a commercial hosted service, SaaS, PaaS, API service, or managed service without a Commercial License.
+
+In particular, you may not:
+
+* Deploy KidGPT on a public cloud and sell access to it.
+* Offer KidGPT as a subscription service.
+* Offer a white-labeled version of KidGPT.
+* Provide a hosted version of KidGPT to customers.
+* Create a competing commercial service substantially based on KidGPT.
+* Make the source code available as part of a commercial hosted-service offering.
+
+A Commercial License is required for these activities.
+
+---
+
+## 6. Redistribution
+
+You may redistribute the original or modified Software for permitted non-commercial purposes provided that:
+
+* This License is included with the Software.
+* The original copyright notice is retained.
+* You do not remove or obscure existing attribution notices.
+* You clearly indicate any significant modifications.
+* You do not represent the modified Software as the official KidGPT product.
+* You do not imply endorsement by the copyright holder.
+
+Redistribution for Commercial Use requires a Commercial License.
+
+---
+
+## 7. Derivative Works
+
+You may modify KidGPT and create derivative works for permitted non-commercial purposes.
+
+However, modifying the Software does not remove the Commercial Use restrictions in this License.
+
+A derivative work that is based substantially on KidGPT remains subject to this License unless the copyright holder provides a separate written license.
+
+You may not take the KidGPT source code, substantially modify it, rename it, and distribute it as a commercial product without obtaining a Commercial License.
+
+---
+
+## 8. Commercial License
+
+A Commercial License may grant additional rights, including but not limited to:
+
+* Commercial production deployment.
+* Commercial self-hosting.
+* SaaS deployment.
+* Customer-facing deployment.
+* Redistribution.
+* White-labeling.
+* OEM or embedded use.
+* Enterprise deployment.
+* Commercial modification.
+* Commercial support and maintenance.
+
+Commercial licenses are granted separately and may include additional terms and fees.
+
+For commercial licensing inquiries, please contact:
+
+**Email:** vankhangfet@gmail.com
+
+---
+
+## 9. Personal and Educational Use
+
+Individuals may use KidGPT free of charge for personal learning, experimentation, and educational purposes, subject to this License.
+
+Educational institutions may use KidGPT for non-commercial educational activities.
+
+This permission does not extend to commercial educational platforms, paid tutoring services, commercial learning management systems, or other revenue-generating educational services.
+
+---
+
+## 10. Trademarks and Branding
+
+This License does not grant permission to use the trademarks, logos, product names, service names, or branding associated with KidGPT or Sparkle Tutor.
+
+You may refer to KidGPT for factual purposes, such as:
+
+> "Based on KidGPT"
+
+provided that such use does not imply endorsement, sponsorship, or official affiliation.
+
+You may not:
+
+* Use "KidGPT" or "Sparkle Tutor" as the name of a competing product.
+* Use the KidGPT logo in a commercial product without permission.
+* Represent a modified version as the official KidGPT product.
+* Imply that the copyright holder endorses your product or service.
+
+---
+
+## 11. Third-Party Components
+
+This License applies only to original work owned by the KidGPT copyright holder.
+
+KidGPT may include, depend upon, or interact with third-party software, libraries, frameworks, AI models, APIs, services, fonts, images, or other materials that are subject to their own licenses or terms.
+
+Third-party components are **not automatically covered by this License**.
+
+You are responsible for reviewing and complying with the applicable licenses and terms of third-party components.
+
+In particular, this License does not grant you any rights to:
+
+* OpenAI services or models.
+* Anthropic services or models.
+* Google services or models.
+* z.ai services or models.
+* Ollama or other third-party AI infrastructure beyond the rights granted by their respective licenses.
+* Vercel services.
+* Upstash services.
+* Any third-party API, model, dataset, image, font, or dependency.
+
+Where applicable, the original license of a third-party component remains in effect.
+
+---
+
+## 12. AI Services and API Keys
+
+KidGPT may be configured to use third-party AI providers through environment variables or compatible APIs.
+
+This License does not grant permission to use any third-party AI provider without complying with that provider's applicable:
+
+* Terms of Service.
+* API terms.
+* Acceptable Use Policy.
+* Pricing.
+* Model license.
+* Data processing requirements.
+* Age-related or child-safety requirements.
+
+You are solely responsible for any third-party services that you connect to KidGPT.
+
+---
+
+## 13. Children's Data and Privacy
+
+KidGPT is designed for children aged 6–12.
+
+This License does not grant any rights to collect, process, store, sell, or otherwise use children's personal information.
+
+Anyone deploying KidGPT is solely responsible for:
+
+* Privacy compliance.
+* Data protection.
+* Child safety.
+* Parental consent requirements.
+* Data retention policies.
+* Data processing agreements.
+* Applicable laws and regulations.
+* Compliance with the terms of any AI or cloud provider used by the deployment.
+
+If you modify KidGPT to store user accounts, conversations, personal information, telemetry, or other data, you are responsible for implementing appropriate privacy and security controls.
+
+---
+
+## 14. No Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE COPYRIGHT HOLDER DISCLAIMS ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, SECURITY, ACCURACY, RELIABILITY, AND AVAILABILITY.
+
+THE COPYRIGHT HOLDER DOES NOT WARRANT THAT THE SOFTWARE WILL:
+
+* BE ERROR-FREE;
+* BE SECURE;
+* BE AVAILABLE AT ALL TIMES;
+* PRODUCE ACCURATE AI-GENERATED OUTPUT;
+* BE SUITABLE FOR CHILDREN IN EVERY CONTEXT; OR
+* COMPLY WITH THE LAWS OR REGULATIONS APPLICABLE TO YOUR DEPLOYMENT.
+
+---
+
+## 15. Limitation of Liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE COPYRIGHT HOLDER SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, OR FOR ANY LOSS OF DATA, REVENUE, PROFITS, BUSINESS OPPORTUNITY, OR GOODWILL ARISING FROM OR RELATED TO THE USE OF THE SOFTWARE.
+
+YOU ARE RESPONSIBLE FOR EVALUATING THE SOFTWARE BEFORE USING IT IN PRODUCTION OR WITH CHILDREN.
+
+---
+
+## 16. Termination
+
+Your rights under this License automatically terminate if you violate any material term of this License.
+
+Upon termination, you must stop using, copying, distributing, and deploying the Software, except where applicable law provides otherwise.
+
+Rights granted to you under a separately executed Commercial License are governed by that agreement.
+
+---
+
+## 17. No Transfer of Ownership
+
+This License does not transfer ownership of the Software or any intellectual property rights to you.
+
+All rights not expressly granted under this License are reserved by the copyright holder.
+
+---
+
+## 18. Contributions
+
+Unless otherwise agreed in writing, contributions submitted to the KidGPT repository are licensed under the same license applicable to the relevant project code at the time of contribution.
+
+By submitting a contribution, you represent that:
+
+* You have the legal right to submit the contribution.
+* The contribution does not knowingly violate third-party intellectual property rights.
+* You understand that the contribution may be publicly distributed as part of KidGPT.
+
+The copyright holder may require a separate Contributor License Agreement for future contributions.
+
+---
+
+## 19. License Changes
+
+The copyright holder reserves the right to release future versions of KidGPT under different licensing terms.
+
+Each release may specify the license that applies to that particular version.
+
+A license change does not retroactively remove rights that were validly granted under a previous version of this License, unless otherwise permitted by applicable law or agreed in writing.
