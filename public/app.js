@@ -1,6 +1,8 @@
 import { esc, checkAnswer } from './util.js';
 import { renderAid } from './aids.js';
 import { t, SUBJECTS, subjectLabel, placeholderFor, suggestsFor, STRINGS } from './i18n.js';
+import { initGate, reopenGate } from './gate.js';
+import { getAuthToken } from './auth.js';
 
 const I = {
   spark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg>',
@@ -32,6 +34,7 @@ let active = null;         // { plan, question, revealed, stepEls, nextBtn }
 let forcedSubject = null;
 let hintLevel = 0;
 let failStreak = 0;
+let currentProfile = null;
 let busy = false;
 let session = 0;
 
@@ -227,16 +230,21 @@ async function planFlow(text) {
   active = null;
   const think = showThinking();
   try {
+    const token = await getAuthToken();
+    if (!token) { reopenGate(); return; }
     const res = await fetch('/api/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
       body: JSON.stringify({
         message: text,
         history: history.slice(-10),
         lang,
         subject: forcedSubject,
+        profileName: currentProfile ? currentProfile.name : null,
+        ageBand: currentProfile ? currentProfile.ageBand : null,
       }),
     });
+    if (res.status === 401) { reopenGate(); return; }
     if (!res.ok) {
       const err = new Error('http_' + res.status);
       err.status = res.status;
@@ -285,9 +293,11 @@ async function judgeFlow(text) {
   const gen = session;
   const think = showThinking();
   try {
+    const token = await getAuthToken();
+    if (!token) { reopenGate(); return; }
     const res = await fetch('/api/judge', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
       body: JSON.stringify({
         question: active.question,
         stepQuestion: step.question,
@@ -295,6 +305,7 @@ async function judgeFlow(text) {
         lang,
       }),
     });
+    if (res.status === 401) { reopenGate(); return; }
     if (!res.ok) throw new Error('http_' + res.status);
     const data = await res.json();
     if (gen !== session) return;
@@ -481,7 +492,28 @@ function init() {
     $('#send').disabled = !input.value.trim();
   });
   applyLang();
-  welcome();
+  initGate({
+    onUnlock: (profile) => {
+      const changed = currentProfile && currentProfile.id !== profile.id;
+      currentProfile = profile;
+      const chip = $('#profileChip');
+      chip.hidden = false;
+      $('#profileChipName').textContent = profile.name;
+      chip.onclick = () => reopenGate();
+      if (changed || stream.children.length === 0) {
+        stream.innerHTML = '';
+        active = null;
+        forcedSubject = null;
+        history = [];
+        hintLevel = 0;
+        failStreak = 0;
+        highlightSubject(null);
+        welcome();
+        renderSuggests(null);
+        input.placeholder = t(lang, 'inputPlaceholder');
+      }
+    },
+  });
 }
 
 init();
