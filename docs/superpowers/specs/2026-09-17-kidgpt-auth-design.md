@@ -63,9 +63,10 @@ Mở app (Firebase Auth session tự phục hồi từ IndexedDB)
    - Body request thêm `ageBand` (enum '6-8'|'9-12') + `profileName` (sanitize ≤ 20 ký tự,
      strip HTML như sanitizeText) → nối vào prompt theo kiểu "(Trẻ: {tên}, khổ tuổi {band})";
      log KHÔNG chứa tên
-5. **CSP** (vercel.json): `script-src` thêm `https://www.gstatic.com`; `connect-src` thêm
-   `https://*.googleapis.com wss://*.googleapis.com`; `frame-src`
-   `https://accounts.google.com https://*.firebaseapp.com` (auth iframe relay)
+5. **CSP** (vercel.json): `script-src` thêm `https://www.gstatic.com https://apis.google.com`
+   (gapi helper cho auth popup trên browser chặn third-party cookie); `connect-src` thêm
+   `https://*.googleapis.com wss://*.googleapis.com https://apis.google.com`; `frame-src`
+   `https://accounts.google.com https://*.firebaseapp.com https://apis.google.com` (auth iframe relay)
 6. Dependency server mới: `jose` (thuần verify + fetch JWKS 1 lần/cache). KHÔNG firebase-admin,
    KHÔNG service account trên server — env duy nhất: `FIREBASE_PROJECT_ID`
 
