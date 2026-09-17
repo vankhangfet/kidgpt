@@ -73,8 +73,24 @@ icon must be one of: sun, cloud, rain, drop, seed, sprout, arrow, question, moon
 
 check: the correct answer FOR THAT STEP (number when computable, string for words) or null for open steps. String checks: lowercase, no diacritics.`;
 
-export function buildSystemPrompt(lang) {
-  return lang === 'en' ? SYSTEM_EN : SYSTEM_VI;
+const BAND_YOUNG_VI = `ĐỐI TƯỢNG HIỆN TẠI: trẻ 6–8 tuổi.
+- Dùng câu CỰC ngắn (tối đa ~10 từ/câu), từ vựng rất đơn giản như nói với bé lớp 1.
+- Ưu tiên 2–3 steps, mỗi bước chỉ hỏi MỘT điều nhỏ.
+- Luôn kèm aid trực quan (number-blocks, group-dots) khi có thể.
+- Khen cụ thể hành động ("con tách số giỏi quá") thay vì khen chung chung.`;
+
+const BAND_YOUNG_EN = `CURRENT LEARNER: a child ages 6–8.
+- Use VERY short sentences (max ~10 words each), simple first-grade vocabulary.
+- Prefer 2–3 steps, each step asking only ONE small thing.
+- Always include a visual aid (number-blocks, group-dots) when possible.
+- Praise specific actions ("great job splitting the number") over generic praise.`;
+
+export function buildSystemPrompt(lang, ageBand) {
+  const base = lang === 'en' ? SYSTEM_EN : SYSTEM_VI;
+  if (ageBand === '6-8') {
+    return base + '\n\n' + (lang === 'en' ? BAND_YOUNG_EN : BAND_YOUNG_VI);
+  }
+  return base;
 }
 
 export function buildJudgePrompt(lang) {
@@ -98,8 +114,8 @@ Chỉ trả JSON: { "verdict": "correct" | "close" | "incorrect" | "new_question
 Dùng tiếng Việt thân thiện, đơn giản cho trẻ nhỏ.`;
 }
 
-export function buildChatMessages({ message, history, subject, lang }) {
-  const msgs = [{ role: 'system', content: buildSystemPrompt(lang) }];
+export function buildChatMessages({ message, history, subject, lang, profileName, ageBand }) {
+  const msgs = [{ role: 'system', content: buildSystemPrompt(lang, ageBand) }];
   for (const m of history || []) {
     if ((m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string') {
       msgs.push({ role: m.role, content: m.content });
@@ -108,6 +124,9 @@ export function buildChatMessages({ message, history, subject, lang }) {
   let user = message;
   if (subject) {
     user += lang === 'en' ? `\n(Subject: ${subject})` : `\n(Chủ đề: ${subject})`;
+  }
+  if (profileName && ageBand) {
+    user += lang === 'en' ? `\n(Child: ${profileName}, age band: ${ageBand})` : `\n(Trẻ: ${profileName}, khổ tuổi: ${ageBand})`;
   }
   msgs.push({ role: 'user', content: user });
   return msgs;
