@@ -90,6 +90,20 @@ describe('prompt hardening', () => {
     expect(msgs.length).toBe(3);
     expect(msgs.filter((m) => m.role === 'system').length).toBe(1);
   });
+  it('treats en-dash band as unknown (hyphen-only contract)', () => {
+    expect(buildSystemPrompt('vi', '6–8')).toBe(buildSystemPrompt('vi'));
+    expect(buildSystemPrompt('vi', '3-5')).toBe(buildSystemPrompt('vi'));
+  });
+  it('places the band block after the base rules', () => {
+    const vi = buildSystemPrompt('vi', '6-8');
+    expect(vi.indexOf('QUY TẮC SƯ PHẠM')).toBeLessThan(vi.indexOf('6–8 tuổi'));
+  });
+  it('omits the profile suffix when either name or band is missing', () => {
+    const nameOnly = buildChatMessages({ message: 'q', history: [], lang: 'vi', profileName: 'Bi', ageBand: null });
+    const bandOnly = buildChatMessages({ message: 'q', history: [], lang: 'vi', profileName: '', ageBand: '6-8' });
+    expect(nameOnly.at(-1).content).toBe('q');
+    expect(bandOnly.at(-1).content).toBe('q');
+  });
 });
 
 describe('age band adaptation', () => {
