@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="games.css" />
 </head>
 <body>
   <div class="app">
@@ -36,7 +37,7 @@
     <div class="main">
       <nav class="rail" id="rail" aria-label="Chọn chủ đề"></nav>
 
-      <section class="chat" aria-label="Chat với Sparkle">
+      <section class="chat" id="chatView" aria-label="Chat với Sparkle">
         <div class="stream" id="stream" role="log" aria-live="polite"></div>
 
         <div class="composer">
@@ -50,6 +51,8 @@
           </form>
         </div>
       </section>
+
+      <section class="games" id="gamesView" aria-label="Trò chơi" hidden></section>
     </div>
   </div>
 

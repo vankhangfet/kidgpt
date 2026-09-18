@@ -26,6 +26,10 @@
   --curio:   oklch(72% 0.14 60);
   --english: oklch(60% 0.12 300);
 
+  /* games */
+  --games: oklch(60% 0.15 300);
+  --chess: oklch(56% 0.12 155);
+
   --radius:   18px;
   --radius-lg: 26px;
   --radius-pill: 999px;
@@ -49,6 +53,7 @@
     --tutor: #30a5a2; --tutor-soft: #ddf2f1; --success: #37b86b; --success-soft: #ddf3e6;
     --warn: #e8bf59; --warn-soft: #faf0d7; --math: #5a5fd1; --reading: #e05a92;
     --science: #3aa877; --curio: #d9a13f; --english: #9a5fd0;
+    --games: #8a46d8; --chess: #2b9d6b;
   }
 }
 
@@ -187,6 +192,7 @@ h1, h2, h3, .display { font-family: var(--font-display); letter-spacing: -0.01em
 .subject[data-subject="science"] .ic { color: var(--science); }
 .subject[data-subject="curio"]   .ic { color: var(--curio); }
 .subject[data-subject="english"] .ic { color: var(--english); }
+.subject[data-subject="games"] .ic { color: var(--games); }
 .subject:hover { transform: translateY(-2px); }
 .subject[aria-pressed="true"] {
   border-color: currentColor;
@@ -198,6 +204,7 @@ h1, h2, h3, .display { font-family: var(--font-display); letter-spacing: -0.01em
 .subject[data-subject="science"][aria-pressed="true"] { color: var(--science); background: #ebf6f0; background: color-mix(in oklch,#fff 86%, var(--science)); }
 .subject[data-subject="curio"][aria-pressed="true"]   { color: var(--curio);   background: #faf3e6; background: color-mix(in oklch,#fff 86%, var(--curio)); }
 .subject[data-subject="english"][aria-pressed="true"] { color: var(--english); background: #f4eefb; background: color-mix(in oklch,#fff 86%, var(--english)); }
+.subject[data-subject="games"][aria-pressed="true"] { color: var(--games); background: #f6eefd; background: color-mix(in oklch,#fff 86%, var(--games)); }
 .subject[aria-pressed="true"] .label { color: var(--fg); }
 
 /* chat column */

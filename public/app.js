@@ -3,6 +3,7 @@ import { renderAid } from './aids.js';
 import { t, SUBJECTS, subjectLabel, placeholderFor, suggestsFor, STRINGS } from './i18n.js';
 import { initGate, reopenGate } from './gate.js';
 import { getAuthToken } from './auth.js';
+import { showGames, hideGames, refreshGames } from './games/hub.js';
 
 const I = {
   spark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg>',
@@ -12,6 +13,7 @@ const I = {
   english: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l2.5-2.5A8 8 0 1 1 21 12z"/><path d="M8.5 10.5h7M8.5 13.5h4.5"/></svg>',
   science: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6.5L5.5 17a2 2 0 0 0 1.8 3h9.4a2 2 0 0 0 1.8-3L14 9.5V3"/><path d="M8.5 14h7"/></svg>',
   curio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 0 1 4.5 1.5c0 1.7-2.5 2-2.5 3.5"/><path d="M12 17.5h.01"/></svg>',
+  games: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="10" rx="5"/><path d="M7 11v4M5 13h4"/><circle cx="15.5" cy="12" r=".9" fill="currentColor" stroke="none"/><circle cx="18.5" cy="14" r=".9" fill="currentColor" stroke="none"/></svg>',
   bulb: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.4 1 2.5h6c0-1.1.3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>',
   key: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4.5"/><path d="M11 12l8-8M17 4l2 2M14 7l2 2"/></svg>',
   check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
@@ -394,6 +396,14 @@ function renderRail() {
     });
     rail.appendChild(btn);
   }
+  const gbtn = document.createElement('button');
+  gbtn.className = 'subject';
+  gbtn.dataset.subject = 'games';
+  gbtn.type = 'button';
+  gbtn.setAttribute('aria-pressed', 'false');
+  gbtn.innerHTML = '<span class="ic" aria-hidden="true">' + I.games + '</span><span class="label">' + esc(t(lang, 'gamesLabel')) + '</span>';
+  gbtn.addEventListener('click', toggleGames);
+  rail.appendChild(gbtn);
 }
 
 function renderSuggests(subject) {
@@ -408,6 +418,21 @@ function renderSuggests(subject) {
   }
 }
 
+function setView(games) {
+  $('#chatView').hidden = games;
+  $('#gamesView').hidden = !games;
+  const gb = $('#rail .subject[data-subject="games"]');
+  if (gb) gb.setAttribute('aria-pressed', String(games));
+  if (games) {
+    highlightSubject(null);
+    showGames(currentProfile ? currentProfile.id : 'guest', lang);
+  } else {
+    hideGames();
+  }
+}
+
+function toggleGames() { setView($('#gamesView').hidden); }
+
 function applyLang() {
   document.documentElement.lang = lang;
   $('#tagline').textContent = t(lang, 'tagline');
@@ -420,6 +445,7 @@ function applyLang() {
   input.placeholder = forcedSubject ? placeholderFor(lang, forcedSubject) : t(lang, 'inputPlaceholder');
   renderRail();
   renderSuggests(forcedSubject);
+  refreshGames(lang);
 }
 
 function welcome() {
@@ -447,6 +473,12 @@ function welcome() {
       });
       chips.appendChild(c);
     }
+    const gc = document.createElement('button');
+    gc.className = 'chip';
+    gc.type = 'button';
+    gc.innerHTML = I.games + esc(t(lang, 'gamesLabel'));
+    gc.addEventListener('click', () => setView(true));
+    chips.appendChild(gc);
     b.appendChild(chips);
   });
 }
