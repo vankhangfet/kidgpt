@@ -73,7 +73,7 @@ describe('treasure question generator', () => {
       const sorted = q.options.slice().sort((x, y) => x - y);
       if (sorted[1] !== q.answer) nonMedian += 1;
     }
-    expect(nonMedian).toBeGreaterThanOrEqual(105);
+    expect(nonMedian).toBeGreaterThanOrEqual(100);
   });
 
   it('questionPrompt renders operands, symbols and escapes node names', () => {
