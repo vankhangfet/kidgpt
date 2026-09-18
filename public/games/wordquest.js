@@ -40,11 +40,15 @@ const CRYSTAL_SVG = '<svg viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/sv
 export function renderWordQuest(body, ctx) {
   const L = ctx.lang;
   let save = loadProgress(ctx.profileId, 'wordquest') || { zone: 1, maxZone: 1, stage: 0, done: 0 };
+  save.zone = Math.min(Math.max(save.zone || 1, 1), 5);
+  save.stage = Math.min(Math.max(save.stage || 0, 0), sentencesInZone(save.zone).length - 1);
+  save.maxZone = Math.min(Math.max(save.maxZone || 1, 1), 5);
   let sentence = null;   // câu hiện tại
   let bank = [];         // [{word, used}] — mỗi thẻ là 1 instance của từ
   let placed = [];       // slot → index trong bank (null = trống)
   let selected = null;   // index trong bank đang chọn
   let pending = null;    // timer id cho chuyển câu
+  let won = false;         // đang trong cửa sổ chúc mừng (không cho trả thẻ)
 
   const score = el('span', 'gt-score', '🔮 ' + save.done);
   ctx.top.appendChild(score);
@@ -94,6 +98,7 @@ export function renderWordQuest(body, ctx) {
 
   function newSentence() {
     clearPending();
+    won = false;
     const list = sentencesInZone(save.zone);
     sentence = list[save.stage];
     bank = shuffleWords(sentence.words).map((w) => ({ word: w, used: false }));
@@ -115,7 +120,7 @@ export function renderWordQuest(body, ctx) {
       const slot = el('div', 'wq-slot' + (bi !== null ? ' filled' : ''));
       if (bi !== null) slot.appendChild(el('span', 'word-card', esc(bank[bi].word)));
       slot.addEventListener('click', (e) => {
-        if (bi === null) return;   // ô trống: listener đặt thẻ (phía dưới) xử lý
+        if (bi === null || won) return;   // ô trống: listener đặt thẻ xử lý; won: đang chúc mừng
         e.stopPropagation();       // ô đã xếp: trả thẻ về bank
         bank[bi].used = false;
         placed[i] = null;
@@ -164,6 +169,7 @@ export function renderWordQuest(body, ctx) {
       return;
     }
     // đúng!
+    won = true;
     save.done += 1;
     const zoneLen = sentencesInZone(save.zone).length;
     if (save.stage >= zoneLen - 1) {
