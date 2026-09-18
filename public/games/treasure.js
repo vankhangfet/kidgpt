@@ -98,6 +98,7 @@ export function renderTreasure(body, ctx) {
     { level: 1, maxLevel: 1, node: 0, qIdx: 0, gems: 0, total: 0 };
   let q = null;
   let wrong = 0;
+  let pending = null;
 
   const score = el('span', 'gt-score', '💎 ' + save.total);
   ctx.top.appendChild(score);
@@ -117,11 +118,14 @@ export function renderTreasure(body, ctx) {
   function drawLevels() {
     levelRow.innerHTML = '';
     TREASURE_LEVELS.forEach((lv) => {
-      const pill = el('span', 'level-pill' + (lv.id === save.level ? ' active' : ''));
+      const pill = el('button', 'level-pill' + (lv.id === save.level ? ' active' : ''));
+      pill.type = 'button';
       pill.textContent = 'Lv ' + lv.id + ' · ' + t(L, 'trLv' + lv.id);
-      if (lv.id > save.maxLevel) pill.classList.add('locked');
-      else if (lv.id !== save.level) {
-        pill.style.cursor = 'pointer';
+      if (lv.id > save.maxLevel) {
+        pill.classList.add('locked');
+        pill.disabled = true;
+        pill.title = L === 'en' ? 'Clear the earlier levels first!' : 'Qua các cấp trước đã nhé!';
+      } else if (lv.id !== save.level) {
         pill.title = t(L, 'gameGo');
         pill.addEventListener('click', () => {
           save.level = lv.id; save.node = 0; save.qIdx = 0; save.gems = 0;
@@ -159,10 +163,12 @@ export function renderTreasure(body, ctx) {
   function draw() { drawLevels(); drawMap(); drawTray(); }
 
   function newQ() {
+    if (pending) { clearTimeout(pending); pending = null; }
     wrong = 0;
     q = makeQuestion(save.level);
     sayMsg(questionPrompt(q, L, t(L, 'trNode' + (save.node + 1))));
     drawOpts();
+    hintBtn.disabled = false;
   }
 
   function drawOpts() {
@@ -176,7 +182,7 @@ export function renderTreasure(body, ctx) {
   }
 
   function cheer() {
-    const list = STRINGS[L].cheers;
+    const list = (STRINGS[L] || STRINGS.vi).cheers;
     return list[Math.floor(Math.random() * list.length)];
   }
 
@@ -184,6 +190,7 @@ export function renderTreasure(body, ctx) {
     if (v === q.answer) {
       btn.classList.add('right');
       opts.querySelectorAll('button').forEach((x) => { x.disabled = true; });
+      hintBtn.disabled = true;
       save.gems += 1;
       save.total += 1;
       save.qIdx += 1;
@@ -195,7 +202,7 @@ export function renderTreasure(body, ctx) {
         else nodeDone();
       } else {
         sayMsg('✨ <strong>' + esc(cheer()) + '</strong>', 'win');
-        setTimeout(newQ, 700);
+        pending = setTimeout(newQ, 700);
       }
       persist();
       drawMap();
@@ -211,7 +218,7 @@ export function renderTreasure(body, ctx) {
     draw();
     sayMsg('🎉 <strong>' + esc(t(L, 'trNode' + save.node)) + '</strong> — ' +
       (L === 'en' ? 'checkpoint cleared! On we go!' : 'qua chặng rồi, tiến tiếp nào!'), 'win');
-    setTimeout(newQ, 900);
+    pending = setTimeout(newQ, 900);
   }
 
   function levelDone() {
@@ -222,13 +229,13 @@ export function renderTreasure(body, ctx) {
       persist(); draw();
       sayMsg('🏆 <strong>' + esc(t(L, 'trLv' + save.level)) + '</strong> — ' +
         (L === 'en' ? 'level complete! A new island map unlocks!' : 'hoàn thành cấp độ! Mở bản đồ mới!'), 'win');
-      setTimeout(newQ, 1100);
+      pending = setTimeout(newQ, 1100);
     } else {
       save.node = 0; save.qIdx = 0; save.gems = 0;
       persist(); draw();
       sayMsg('🏴‍☠️💎 <strong>' + (L === 'en' ? 'The Lost Treasure is YOURS!' : 'Kho báu thất truyền là của bạn!') +
         '</strong> ' + (L === 'en' ? 'Play this level again or collect more gems!' : 'Chơi lại cấp này hoặc gom thêm kim cương nhé!'), 'win');
-      setTimeout(newQ, 1100);
+      pending = setTimeout(newQ, 1100);
     }
   }
 

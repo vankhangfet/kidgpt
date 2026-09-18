@@ -147,6 +147,7 @@
   padding: 5px 12px; border-radius: var(--radius-pill);
   background: var(--bg-2); color: var(--muted); border: 2px solid transparent;
 }
+button.level-pill { cursor: pointer; }
 .level-pill.active {
   background: color-mix(in oklch, #fff 80%, var(--treasure-sea));
   color: var(--treasure-sea); border-color: var(--treasure-sea);
