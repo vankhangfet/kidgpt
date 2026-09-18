@@ -1,7 +1,7 @@
 import { WQ_SENTENCES } from './content.js';
 
 export function shuffleWords(words) {
-  if (words.length < 2) return words.slice();
+  if (words.length < 2 || words.every((w) => w === words[0])) return words.slice();
   let out;
   do {
     out = words.slice();

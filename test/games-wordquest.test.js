@@ -27,6 +27,13 @@ describe('word quest content', () => {
     const z3 = sentencesInZone(3);
     expect(z3).toHaveLength(4);
     expect(z3.every((s) => s.zone === 3)).toBe(true);
+    expect(z3).toEqual(WQ_SENTENCES.filter((s) => s.zone === 3));
+  });
+
+  it('english sentence equals words joined (no stray punctuation)', () => {
+    for (const s of WQ_SENTENCES) {
+      expect(s.en).toBe(s.words.join(' ') + '.');
+    }
   });
 });
 
@@ -49,8 +56,10 @@ describe('shuffleWords', () => {
     shuffleWords(words);
     expect(words).toEqual(['a', 'b', 'c']);
   });
+});
 
-  it('firstWrongSlot finds the first mismatch and -1 when correct', () => {
+describe('firstWrongSlot', () => {
+  it('finds the first mismatch and -1 when correct', () => {
     expect(firstWrongSlot(['The', 'dog'], ['The', 'cat'])).toBe(1);
     expect(firstWrongSlot([null, 'b'], ['a', 'b'])).toBe(0);
     expect(firstWrongSlot(['a', 'b'], ['a', 'b'])).toBe(-1);
@@ -97,7 +106,7 @@ describe('detective content shape', () => {
     }
   });
 
-  it('culprit is logically consistent with clue facts (cookie case: witness contradiction)', () => {
+  it('cookie case culprit regression pin (witness contradiction)', () => {
     const cookie = DETECTIVE_CASES.find((c) => c.id === 'cookie');
     expect(cookie.culprit).toBe(2);
     expect(cookie.clues.some((cl) => cl.who === 1)).toBe(true);

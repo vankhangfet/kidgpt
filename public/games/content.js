@@ -13,7 +13,7 @@ export const WQ_SENTENCES = [
   { zone: 2, words: ['The', 'sun', 'is', 'bright'], vi: 'Mặt trời thật sáng.', en: 'The sun is bright.' },
   { zone: 2, words: ['He', 'has', 'two', 'cats'], vi: 'Cậu ấy có hai con mèo.', en: 'He has two cats.' },
   // Zone 3 · 5 từ
-  { zone: 3, words: ['We', 'go', 'to', 'school', 'today'], vi: 'Hôm nay chúng tớ đi học.', en: 'We go to school today.' },
+  { zone: 3, words: ['We', 'walk', 'to', 'school', 'together'], vi: 'Chúng tớ cùng đi bộ đến trường.', en: 'We walk to school together.' },
   { zone: 3, words: ['The', 'bird', 'sings', 'a', 'song'], vi: 'Chim hót một bài hát.', en: 'The bird sings a song.' },
   { zone: 3, words: ['I', 'can', 'see', 'the', 'moon'], vi: 'Tớ thấy mặt trăng.', en: 'I can see the moon.' },
   { zone: 3, words: ['She', 'drinks', 'milk', 'every', 'morning'], vi: 'Cô bé uống sữa mỗi sáng.', en: 'She drinks milk every morning.' },
@@ -26,9 +26,13 @@ export const WQ_SENTENCES = [
   { zone: 5, words: ['Every', 'morning', 'the', 'rooster', 'crows', 'very', 'loudly'], vi: 'Mỗi sáng gà trống gáy rất to.', en: 'Every morning the rooster crows very loudly.' },
   { zone: 5, words: ['My', 'best', 'friend', 'always', 'shares', 'her', 'toys'], vi: 'Bạn thân của tớ luôn chia sẻ đồ chơi.', en: 'My best friend always shares her toys.' },
   { zone: 5, words: ['We', 'watched', 'a', 'funny', 'movie', 'last', 'night'], vi: 'Tối qua chúng tớ xem một phim hài.', en: 'We watched a funny movie last night.' },
-  { zone: 5, words: ['The', 'old', 'turtle', 'walks', 'to', 'the', 'pond'], vi: 'Con rùa già chậm rãi đi về phía cái ao.', en: 'The old turtle walks to the pond.' },
+  { zone: 5, words: ['The', 'old', 'turtle', 'walks', 'to', 'the', 'pond'], vi: 'Con rùa già đi về phía cái ao.', en: 'The old turtle walks to the pond.' },
 ];
 
+// Mỗi vụ án: suspects (3, theo thứ tự hiển thị), clues[{who: chỉ số nghi phạm,
+// flag: manh mối then chốt — viền vàng}], steps[{q, options (đúng 1 mục
+// correct), hint}], culprit (chỉ số thủ phạm), nudge (gợi ý khi tố sai),
+// closing (lời chúc mừng, cho phép <strong>). Mọi văn bản đều {vi, en}.
 export const DETECTIVE_CASES = [
   {
     id: 'cookie',
