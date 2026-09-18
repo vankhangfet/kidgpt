@@ -421,14 +421,14 @@ function renderSuggests(subject) {
 function setView(games) {
   $('#chatView').hidden = games;
   $('#gamesView').hidden = !games;
-  const gb = $('#rail .subject[data-subject="games"]');
-  if (gb) gb.setAttribute('aria-pressed', String(games));
   if (games) {
     highlightSubject(null);
     showGames(currentProfile ? currentProfile.id : 'guest', lang);
   } else {
     hideGames();
   }
+  const gb = $('#rail .subject[data-subject="games"]');
+  if (gb) gb.setAttribute('aria-pressed', String(games));
 }
 
 function toggleGames() { setView($('#gamesView').hidden); }
