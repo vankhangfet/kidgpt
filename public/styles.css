@@ -214,6 +214,7 @@ h1, h2, h3, .display { font-family: var(--font-display); letter-spacing: -0.01em
   min-height: 0;
   min-width: 0;
 }
+.chat[hidden] { display: none; }
 
 .stream {
   flex: 1;

@@ -60,6 +60,7 @@ export function hideGames() {
   const v = document.getElementById('gamesView');
   if (v) v.innerHTML = '';
   current = null;
+  ctx = null;
 }
 
 export function refreshGames(lang) {
@@ -93,7 +94,7 @@ function renderHub() {
     const card = el('button', 'game-card ' + g.cls);
     card.type = 'button';
     card.innerHTML =
-      '<span class="gc-badge">' + g.emoji + '</span>' +
+      '<span class="gc-badge" aria-hidden="true">' + g.emoji + '</span>' +
       '<div class="gc-title">' + esc(g.title[ctx.lang]) + '</div>' +
       '<div class="gc-desc">' + esc(g.desc[ctx.lang]) + '</div>' +
       '<span class="gc-go">' + esc(t(ctx.lang, 'gameGo')) + ' ' + GO_SVG + '</span>';
@@ -114,7 +115,7 @@ function openGame(id) {
   inner.appendChild(topbar());
   const panel = el('div', 'game ' + g.cls);
   const top = el('div', 'game-top',
-    '<span class="gt-emoji">' + g.emoji + '</span>' +
+    '<span class="gt-emoji" aria-hidden="true">' + g.emoji + '</span>' +
     '<span><div class="gt-title">' + esc(g.title[ctx.lang]) + '</div></span>');
   const body = el('div', 'game-body');
   panel.appendChild(top);

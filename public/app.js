@@ -535,6 +535,7 @@ function init() {
       $('#profileChipName').textContent = profile.name;
       chip.onclick = () => reopenGate();
       if (changed || stream.children.length === 0) {
+        if (!$('#gamesView').hidden) setView(false);
         session += 1;
         stream.innerHTML = '';
         active = null;

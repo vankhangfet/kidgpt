@@ -270,7 +270,7 @@
 .sq.dest.cap::after {
   width: 86%; height: 86%; background: transparent; border: 4px solid rgba(200, 60, 50, .8);
 }
-.sq.chk { background: #e06a55 !important; }
+.sq.chk { background: #e06a55; }
 .sq.hintmark { outline: 3px solid var(--gold, #e8c35a); outline-offset: -3px; }
 .chess-log {
   max-height: 120px; overflow-y: auto; font-family: var(--font-display);
