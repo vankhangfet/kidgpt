@@ -389,6 +389,7 @@ function renderRail() {
     btn.setAttribute('aria-pressed', String(s === forcedSubject));
     btn.innerHTML = '<span class="ic" aria-hidden="true">' + I[s] + '</span><span class="label">' + esc(subjectLabel(lang, s)) + '</span>';
     btn.addEventListener('click', () => {
+      if (!$('#gamesView').hidden) setView(false);
       forcedSubject = s;
       highlightSubject(s);
       input.placeholder = placeholderFor(lang, s);
@@ -400,7 +401,7 @@ function renderRail() {
   gbtn.className = 'subject';
   gbtn.dataset.subject = 'games';
   gbtn.type = 'button';
-  gbtn.setAttribute('aria-pressed', 'false');
+  gbtn.setAttribute('aria-pressed', String($('#gamesView').hidden ? false : true));
   gbtn.innerHTML = '<span class="ic" aria-hidden="true">' + I.games + '</span><span class="label">' + esc(t(lang, 'gamesLabel')) + '</span>';
   gbtn.addEventListener('click', toggleGames);
   rail.appendChild(gbtn);
@@ -426,6 +427,7 @@ function setView(games) {
     showGames(currentProfile ? currentProfile.id : 'guest', lang);
   } else {
     hideGames();
+    highlightSubject(forcedSubject);
   }
   const gb = $('#rail .subject[data-subject="games"]');
   if (gb) gb.setAttribute('aria-pressed', String(games));
