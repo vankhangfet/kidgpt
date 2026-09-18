@@ -424,7 +424,7 @@ function setView(games) {
   $('#gamesView').hidden = !games;
   if (games) {
     highlightSubject(null);
-    showGames(currentProfile ? currentProfile.id : 'guest', lang);
+    showGames(currentProfile ? currentProfile.id : 'guest', lang, () => setView(false));
   } else {
     hideGames();
     highlightSubject(forcedSubject);

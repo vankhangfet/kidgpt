@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { t, SUBJECTS } from '../public/i18n.js';
 
 const SHARED = [
-  'gamesLabel', 'gamesSay', 'gameGo', 'gameBack', 'gameReset', 'gemsLabel',
+  'gamesLabel', 'gamesSay', 'gameGo', 'gameBack', 'gameBackChat', 'gameReset', 'gemsLabel',
   'wqCast', 'dgCase', 'dgAccuse', 'dgNextCase',
   'chIntro', 'chNewGame', 'chUndo', 'chHint', 'chCheck', 'chCapture', 'chAte',
   'chWin', 'chLose', 'chDraw', 'chStats',
