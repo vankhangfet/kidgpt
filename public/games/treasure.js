@@ -21,8 +21,8 @@ const HINTS = {
     en: ['Take {b} away from {a} — how many are left?', 'Count back from {a} exactly {b} steps.'],
   },
   mul: {
-    vi: ['{a} nhóm, mỗi nhóm {b} — cộng dồn thử xem!', 'Nhẩm bảng nhân rồi: {a} nhân {b} bằng mấy nhỉ?'],
-    en: ['{a} groups of {b} — try adding them up!', 'Times tables: what is {a} times {b}?'],
+    vi: ['{a} nhóm, mỗi nhóm {b} — cộng dồn thử xem!', 'Thử tính {a} × ({b}−1) trước, rồi cộng thêm {b} nữa nhé.'],
+    en: ['{a} groups of {b} — try adding them up!', 'Work out {a} × ({b}−1) first, then add one more {b}.'],
   },
   div: {
     vi: ['Chia đều {a} vào {b} nhóm — mỗi nhóm mấy?', 'Nhẩm bảng nhân: {b} nhân mấy thì bằng {a}?'],
@@ -33,7 +33,7 @@ const HINTS = {
 function ri(min, max) { return min + Math.floor(Math.random() * (max - min + 1)); }
 
 export function makeQuestion(levelId) {
-  const lv = TREASURE_LEVELS[levelId - 1];
+  const lv = TREASURE_LEVELS[Math.min(Math.max(levelId, 1), TREASURE_LEVELS.length) - 1];
   const op = lv.ops[ri(0, lv.ops.length - 1)];
   let a, b, answer;
   if (op === 'add') {
@@ -52,25 +52,35 @@ export function makeQuestion(levelId) {
   return { op, a, b, answer, options: makeOptions(answer, op, a, b) };
 }
 
-export function makeOptions(answer, op, a, b) {
-  const cands = [answer + 1, answer - 1, op === 'sub' ? a + b : Math.abs(a - b), answer + 10, answer - 10, answer + 2];
-  const opts = [answer];
-  for (const c of cands) {
-    if (opts.length >= 3) break;
-    if (c >= 0 && !opts.includes(c)) opts.push(c);
-  }
-  while (opts.length < 3) opts.push(answer + opts.length + 3);
-  for (let i = opts.length - 1; i > 0; i--) {
+function shuffled(arr) {
+  const out = arr.slice();
+  for (let i = out.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [opts[i], opts[j]] = [opts[j], opts[i]];
+    [out[i], out[j]] = [out[j], out[i]];
   }
-  return opts;
+  return out;
+}
+
+export function makeOptions(answer, op, a, b) {
+  let cands;
+  if (op === 'sub') cands = [a + b, answer + 1, answer - 1, answer + 10];
+  else if (op === 'add') cands = [Math.abs(a - b), answer + 1, answer - 1, answer + 10];
+  else if (op === 'mul') cands = [a * (b + 1), a * (b - 1), answer + 1, answer - 1];
+  else cands = [a - b, a + b, answer + 1, answer - 1];
+  const opts = [answer];
+  for (const c of shuffled(cands)) {
+    if (opts.length >= 3) break;
+    if (Number.isInteger(c) && c >= 0 && c !== answer && !opts.includes(c)) opts.push(c);
+  }
+  let n = 1;
+  while (opts.length < 3) { const c = answer + n + 2; if (!opts.includes(c)) opts.push(c); n += 1; }
+  return shuffled(opts);
 }
 
 export function hintFor(q, step, lang) {
   const pair = HINTS[q.op][lang] || HINTS[q.op].vi;
-  const tpl = pair[Math.min(step, pair.length - 1)];
-  return tpl.replace('{a}', q.a).replace('{b}', q.b);
+  const tpl = pair[Math.min(Math.max(step, 0), pair.length - 1)];
+  return tpl.split('{a}').join(String(q.a)).split('{b}').join(String(q.b));
 }
 
 export function questionPrompt(q, lang, nodeName) {
