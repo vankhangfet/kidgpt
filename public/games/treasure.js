@@ -122,6 +122,7 @@ export function renderTreasure(body, ctx) {
       if (lv.id > save.maxLevel) pill.classList.add('locked');
       else if (lv.id !== save.level) {
         pill.style.cursor = 'pointer';
+        pill.title = t(L, 'gameGo');
         pill.addEventListener('click', () => {
           save.level = lv.id; save.node = 0; save.qIdx = 0; save.gems = 0;
           persist(); draw(); newQ();
