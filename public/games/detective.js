@@ -114,7 +114,17 @@ export function renderDetective(body, ctx) {
       next.addEventListener('click', () => {
         clearPending();
         save.caseIdx += 1;
-        if (save.caseIdx >= DETECTIVE_CASES.length) save.caseIdx = 0;
+        if (save.caseIdx >= DETECTIVE_CASES.length) {
+          save.caseIdx = 0;
+          persist();
+          locked = true;
+          next.disabled = true;
+          sayMsg('🎖️ ' + (L === 'en'
+            ? 'All 3 cases closed — you are a <strong>Chief Detective</strong>! The case files start over whenever you want.'
+            : 'Cả 3 vụ án đều đã phá xong — bạn là <strong>Thám tử trưởng</strong>! Hồ sơ sẽ mở lại bất cứ lúc nào bạn muốn.'), 'win');
+          pending = setTimeout(() => { locked = false; restartCase(); }, 1600);
+          return;
+        }
         persist();
         restartCase();
       });
