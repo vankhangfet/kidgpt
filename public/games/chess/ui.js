@@ -86,7 +86,7 @@ export function renderChess(body, ctx) {
       if (selected === sq) b.classList.add('sel');
       if (targets.some((m) => m.to === sq)) {
         b.classList.add('dest');
-        if (st.board[sq] || sq === st.ep) b.classList.add('cap');
+        if (st.board[sq] || (sq === st.ep && selected !== null && st.board[selected] && st.board[selected].t === 'p')) b.classList.add('cap');
       }
       if (sq === chkSq) b.classList.add('chk');
       if (hintMove && (sq === hintMove.from || sq === hintMove.to)) b.classList.add('hintmark');
@@ -104,6 +104,7 @@ export function renderChess(body, ctx) {
     }
     const p = st.board[sq];
     if (p && p.c === 'w') {
+      if (sq === selected) { selected = null; targets = []; hintMove = null; draw(); return; }
       selected = sq;
       targets = legalMoves(st, sq);
       hintMove = null;
@@ -142,6 +143,7 @@ export function renderChess(body, ctx) {
 
   function botMove() {
     botTimer = null;
+    if (!boardEl.isConnected) return; // game đã bị tháo khỏi DOM — bỏ nước bot trễ
     const stBefore = cur();
     const mv = chooseMove(stBefore);
     if (!mv) { busyBot = false; finish(null); return; }
@@ -186,13 +188,17 @@ export function renderChess(body, ctx) {
   undoBtn.addEventListener('click', () => {
     if (busyBot) return;
     clearBotTimer();
-    // bỏ nước bot + nước người (2 ply), tối thiểu giữ bàn đầu
-    if (states.length >= 3) states.pop();
-    if (states.length >= 2) states.pop();
+    // lùi về lượt người chơi (trắng): bỏ ít nhất 1 state, pop tiếp tới khi tới lượt trắng
+    let popped = 0;
+    while (states.length > 1 && (popped === 0 || states[states.length - 1].turn !== 'w')) {
+      states.pop();
+      popped += 1;
+    }
     over = false; selected = null; targets = []; hintMove = null;
     draw();
-    if (logEl.lastChild) logEl.removeChild(logEl.lastChild);
-    if (logEl.lastChild) logEl.removeChild(logEl.lastChild);
+    for (let i = 0; i < popped; i++) {
+      if (logEl.lastChild) logEl.removeChild(logEl.lastChild);
+    }
   });
 
   const hintBtn = el('button', 'gbtn hint', '💡 ' + esc(t(L, 'chHint')));
