@@ -155,11 +155,13 @@ export function pseudoMoves(s, from) {
       if (from === home && !isAttacked(s.board, home, enemy)) {
         const ks = p.c === 'w' ? s.castling.wk : s.castling.bk;
         const qs = p.c === 'w' ? s.castling.wq : s.castling.bq;
-        if (ks && !s.board[home + 1] && !s.board[home + 2]
+        if (ks && s.board[home + 3] && s.board[home + 3].t === 'r' && s.board[home + 3].c === p.c
+          && !s.board[home + 1] && !s.board[home + 2]
           && !isAttacked(s.board, home + 1, enemy) && !isAttacked(s.board, home + 2, enemy)) {
           out.push({ from, to: home + 2, flag: 'castle' });
         }
-        if (qs && !s.board[home - 1] && !s.board[home - 2] && !s.board[home - 3]
+        if (qs && s.board[home - 4] && s.board[home - 4].t === 'r' && s.board[home - 4].c === p.c
+          && !s.board[home - 1] && !s.board[home - 2] && !s.board[home - 3]
           && !isAttacked(s.board, home - 1, enemy) && !isAttacked(s.board, home - 2, enemy)) {
           out.push({ from, to: home - 2, flag: 'castle' });
         }
@@ -196,7 +198,7 @@ export function applyMove(s, m) {
   if (m.flag === 'castle') {
     const home = p.c === 'w' ? 60 : 4;
     if (m.to === home + 2) { n.board[home + 1] = n.board[home + 3]; n.board[home + 3] = null; }
-    else { n.board[home - 1] = n.board[home - 3]; n.board[home - 3] = null; }
+    else { n.board[home - 1] = n.board[home - 4]; n.board[home - 4] = null; }
   }
   n.ep = m.flag === 'double' ? (m.from + m.to) / 2 : -1;
   if (p.t === 'k') {

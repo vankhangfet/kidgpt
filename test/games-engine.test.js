@@ -124,6 +124,45 @@ describe('applyMove', () => {
     const n = applyMove(s, { from: squareIndex('a7'), to: squareIndex('a8'), flag: null });
     expect(n.board[squareIndex('a8')]).toEqual({ t: 'q', c: 'w' });
   });
+
+  it('queenside castle relocates the rook from a1 to d1', () => {
+    const s = customState(
+      [['e1', 'k', 'w'], ['a1', 'r', 'w'], ['e8', 'k', 'b']],
+      'w', { wk: false, wq: true, bk: false, bq: false });
+    const n = applyMove(s, { from: 60, to: 58, flag: 'castle' });
+    expect(n.board[squareIndex('c1')].t).toBe('k');
+    expect(n.board[squareIndex('d1')].t).toBe('r');
+    expect(n.board[squareIndex('a1')]).toBeNull();
+    expect(n.board[squareIndex('e1')]).toBeNull();
+    expect(n.board[squareIndex('b1')]).toBeNull();
+  });
+
+  it('queenside castle works for black too', () => {
+    const s = customState(
+      [['e8', 'k', 'b'], ['a8', 'r', 'b'], ['e1', 'k', 'w']],
+      'b', { wk: false, wq: false, bk: false, bq: true });
+    const n = applyMove(s, { from: 4, to: 2, flag: 'castle' });
+    expect(n.board[squareIndex('c8')].t).toBe('k');
+    expect(n.board[squareIndex('d8')].t).toBe('r');
+    expect(n.board[squareIndex('a8')]).toBeNull();
+  });
+
+  it('capturing a rook on h8 clears black kingside castling right', () => {
+    const s = customState(
+      [['h8', 'r', 'b'], ['h1', 'r', 'w'], ['e1', 'k', 'w'], ['e8', 'k', 'b']],
+      'w', { wk: false, wq: false, bk: true, bq: false });
+    const n = applyMove(s, { from: squareIndex('h1'), to: squareIndex('h8'), flag: null });
+    expect(n.castling.bk).toBe(false);
+  });
+
+  it('castling is refused when the rook has wandered off', () => {
+    const s = customState(
+      [['e1', 'k', 'w'], ['f1', 'r', 'w'], ['e8', 'k', 'b']],
+      'w', { wk: true, wq: true, bk: false, bq: false });
+    const tos = pseudoMoves(s, squareIndex('e1')).map((m) => m.to);
+    expect(tos).not.toContain(62); // không có xe ở h1
+    expect(tos).not.toContain(58); // không có xe ở a1
+  });
 });
 
 describe('legalMoves and check', () => {
