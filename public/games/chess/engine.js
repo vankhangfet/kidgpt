@@ -180,3 +180,62 @@ export function pseudoMoves(s, from) {
   }
   return out;
 }
+
+// Áp nước đi, trả về state MỚI (không đổi state đầu vào).
+export function applyMove(s, m) {
+  const n = clone(s);
+  const p = n.board[m.from];
+  n.board[m.from] = null;
+  const lastRow = p.c === 'w' ? 0 : 7;
+  if (p.t === 'p' && Math.floor(m.to / 8) === lastRow) n.board[m.to] = { t: 'q', c: p.c };
+  else n.board[m.to] = p;
+  if (m.flag === 'ep') {
+    const cap = m.to + (p.c === 'w' ? 8 : -8);
+    n.board[cap] = null;
+  }
+  if (m.flag === 'castle') {
+    const home = p.c === 'w' ? 60 : 4;
+    if (m.to === home + 2) { n.board[home + 1] = n.board[home + 3]; n.board[home + 3] = null; }
+    else { n.board[home - 1] = n.board[home - 3]; n.board[home - 3] = null; }
+  }
+  n.ep = m.flag === 'double' ? (m.from + m.to) / 2 : -1;
+  if (p.t === 'k') {
+    if (p.c === 'w') { n.castling.wk = false; n.castling.wq = false; }
+    else { n.castling.bk = false; n.castling.bq = false; }
+  }
+  for (const sq of [56, 63, 0, 7]) {
+    if (m.from === sq || m.to === sq) {
+      if (sq === 56) n.castling.wq = false;
+      if (sq === 63) n.castling.wk = false;
+      if (sq === 0) n.castling.bq = false;
+      if (sq === 7) n.castling.bk = false;
+    }
+  }
+  n.turn = s.turn === 'w' ? 'b' : 'w';
+  return n;
+}
+
+// Phe `side` có đang bị chiếu không?
+export function inCheck(s, side) {
+  const k = findKing(s.board, side);
+  return k >= 0 && isAttacked(s.board, k, side === 'w' ? 'b' : 'w');
+}
+
+// Nước đi hợp lệ = nước thô mà sau đó vua mình KHÔNG bị chiếu.
+export function legalMoves(s, from) {
+  return pseudoMoves(s, from).filter((m) => !inCheck(applyMove(s, m), s.turn));
+}
+
+export function allLegalMoves(s) {
+  const out = [];
+  for (let i = 0; i < 64; i++) {
+    const p = s.board[i];
+    if (p && p.c === s.turn) out.push(...legalMoves(s, i));
+  }
+  return out;
+}
+
+export function status(s) {
+  if (allLegalMoves(s).length === 0) return inCheck(s, s.turn) ? 'checkmate' : 'stalemate';
+  return inCheck(s, s.turn) ? 'check' : 'playing';
+}

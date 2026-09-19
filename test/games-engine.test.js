@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   initialState, customState, squareName, squareIndex,
   isAttacked, pseudoMoves,
+  applyMove, legalMoves, allLegalMoves, inCheck, status,
 } from '../public/games/chess/engine.js';
 
 describe('squares', () => {
@@ -80,5 +81,97 @@ describe('pseudoMoves', () => {
       'w', { wk: true, wq: false, bk: false, bq: false });
     const mvs = pseudoMoves(s, squareIndex('e1')).map((m) => m.to);
     expect(mvs).not.toContain(62); // f1 bị xe f8 kiểm soát
+  });
+});
+
+describe('applyMove', () => {
+  it('moves a piece and flips the turn without mutating input', () => {
+    const s = initialState();
+    const e2 = squareIndex('e2'), e4 = squareIndex('e4');
+    const n = applyMove(s, { from: e2, to: e4, flag: 'double' });
+    expect(n.board[e2]).toBeNull();
+    expect(n.board[e4]).toEqual({ t: 'p', c: 'w' });
+    expect(n.turn).toBe('b');
+    expect(n.ep).toBe(squareIndex('e3'));
+    expect(s.board[e2]).toEqual({ t: 'p', c: 'w' }); // input không đổi
+    expect(s.turn).toBe('w');
+  });
+
+  it('castles king and rook together', () => {
+    const s = customState(
+      [['e1', 'k', 'w'], ['h1', 'r', 'w'], ['e8', 'k', 'b']],
+      'w', { wk: true, wq: false, bk: false, bq: false });
+    const n = applyMove(s, { from: 60, to: 62, flag: 'castle' });
+    expect(n.board[squareIndex('g1')].t).toBe('k');
+    expect(n.board[squareIndex('f1')].t).toBe('r');
+    expect(n.board[squareIndex('e1')]).toBeNull();
+    expect(n.board[squareIndex('h1')]).toBeNull();
+    expect(n.castling.wk).toBe(false);
+  });
+
+  it('captures en passant and removes the passed pawn', () => {
+    const s = customState(
+      [['e5', 'p', 'w'], ['d5', 'p', 'b'], ['h1', 'k', 'w'], ['h8', 'k', 'b']],
+      'w', undefined, squareIndex('d6'));
+    const n = applyMove(s, { from: squareIndex('e5'), to: squareIndex('d6'), flag: 'ep' });
+    expect(n.board[squareIndex('d6')]).toEqual({ t: 'p', c: 'w' });
+    expect(n.board[squareIndex('d5')]).toBeNull(); // tốt đen bị bắt qua đường
+    expect(n.board[squareIndex('e5')]).toBeNull();
+  });
+
+  it('auto-promotes pawn to queen', () => {
+    const s = customState([['a7', 'p', 'w'], ['h1', 'k', 'w'], ['h8', 'k', 'b']]);
+    const n = applyMove(s, { from: squareIndex('a7'), to: squareIndex('a8'), flag: null });
+    expect(n.board[squareIndex('a8')]).toEqual({ t: 'q', c: 'w' });
+  });
+});
+
+describe('legalMoves and check', () => {
+  it('initial position has exactly 20 legal moves', () => {
+    expect(allLegalMoves(initialState())).toHaveLength(20);
+  });
+
+  it('a pinned knight cannot move', () => {
+    const s = customState(
+      [['e1', 'k', 'w'], ['e3', 'n', 'w'], ['e8', 'r', 'b']],
+      'w', { wk: false, wq: false, bk: false, bq: false });
+    expect(legalMoves(s, squareIndex('e3'))).toHaveLength(0);
+  });
+
+  it('king in check cannot step along the checking line, but can step off it', () => {
+    const s = customState(
+      [['e1', 'k', 'w'], ['e8', 'r', 'b'], ['h8', 'k', 'b'], ['g2', 'p', 'w']],
+      'w', { wk: false, wq: false, bk: false, bq: false });
+    const tos = legalMoves(s, squareIndex('e1')).map((m) => squareName(m.to));
+    expect(tos).not.toContain('e2'); // vẫn nằm trên cột e — xe vẫn chiếu
+    expect(tos).toContain('f2');     // bước ra khỏi cột e thì thoát
+  });
+});
+
+describe('status', () => {
+  it("fool's mate is checkmate", () => {
+    let s = initialState();
+    const mv = (a, b, flag) => { s = applyMove(s, { from: squareIndex(a), to: squareIndex(b), flag: flag || null }); };
+    mv('f2', 'f3', 'double');
+    mv('e7', 'e5', 'double');
+    mv('g2', 'g4', 'double');
+    mv('d8', 'h4');
+    expect(inCheck(s, 'w')).toBe(true);
+    expect(status(s)).toBe('checkmate');
+  });
+
+  it('detects stalemate', () => {
+    const s = customState(
+      [['g6', 'k', 'w'], ['f7', 'q', 'w'], ['h8', 'k', 'b']],
+      'b', { wk: false, wq: false, bk: false, bq: false });
+    expect(status(s)).toBe('stalemate');
+  });
+
+  it('reports check when attacked but with escapes', () => {
+    const s = customState(
+      [['e1', 'k', 'w'], ['e8', 'r', 'b'], ['h8', 'k', 'b'], ['g2', 'p', 'w']],
+      'w', { wk: false, wq: false, bk: false, bq: false });
+    expect(inCheck(s, 'w')).toBe(true);
+    expect(status(s)).toBe('check');
   });
 });
