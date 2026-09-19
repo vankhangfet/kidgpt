@@ -55,3 +55,13 @@ cầu login/link project), mở URL local (mặc định http://localhost:3000).
       được giữ trong nút retry, một chạm gửi lại, không treo)
 - [ ] Bàn phím: Tab qua các nút thấy outline focus; Enter gửi, Shift+Enter xuống dòng
 - [ ] Thu nhỏ cửa sổ ~360px: rail scroll ngang 5 chủ đề, composer dùng được
+
+## Games (Sparkle Games)
+
+- [ ] Rail có nút "Trò chơi"/"Games" (biệt lập với 5 subject) — bấm mở hub, Back quay lại chat, state chat nguyên vẹn
+- [ ] Hub 4 card đúng màu (xanh/tím/nâu/lục); đổi ngôn ngữ ở hub/game → text cập nhật
+- [ ] Treasure: sai 2 lần hiện 2 mức hint, không lộ đáp án; qua chặng mở node kế; hết level mở level mới; tổng gem giữ qua reload
+- [ ] Word Quest: chạm thẻ → chạm ô; sai thứ tự chỉ ô sai đầu; đúng → tinh thể lớn; hết 4 câu mở vùng mới
+- [ ] Detective: trả lời đúng hết bước mới được tố; tố sai được nudge không lộ thủ phạm; 3 vụ tuần tự, hết 3 vụ lên "Thám tử trưởng"
+- [ ] Chess: chấm highlight nước hợp lệ (vòng đỏ = ăn quân); nhập thành + phong cấp tự hậu; Gợi ý/Đi lại/Ván mới; Đi lại sau khi thắng vẫn về lượt người; W/L lưu qua reload
+- [ ] Private mode (block localStorage): game vẫn chơi, không crash console
