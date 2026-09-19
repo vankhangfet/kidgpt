@@ -96,9 +96,18 @@ export function renderTreasure(body, ctx) {
   const L = ctx.lang;
   let save = loadProgress(ctx.profileId, 'treasure') ||
     { level: 1, maxLevel: 1, node: 0, qIdx: 0, gems: 0, total: 0 };
+  save.level = Math.min(Math.max(save.level || 1, 1), TREASURE_LEVELS.length);
+  save.maxLevel = Math.min(Math.max(save.maxLevel || 1, 1), TREASURE_LEVELS.length);
+  save.node = Math.min(Math.max(save.node || 0, 0), NODE_EMOJIS.length - 1);
+  save.qIdx = Math.min(Math.max(save.qIdx || 0, 0), QUESTIONS_PER_NODE - 1);
+  save.gems = Math.min(Math.max(save.gems || 0, 0), GEMS_PER_LEVEL);
   let q = null;
   let wrong = 0;
   let pending = null;
+
+  function clearPending() {
+    if (pending) { clearTimeout(pending); pending = null; }
+  }
 
   const score = el('span', 'gt-score', '💎 ' + save.total);
   ctx.top.appendChild(score);
@@ -163,7 +172,7 @@ export function renderTreasure(body, ctx) {
   function draw() { drawLevels(); drawMap(); drawTray(); }
 
   function newQ() {
-    if (pending) { clearTimeout(pending); pending = null; }
+    clearPending();
     wrong = 0;
     q = makeQuestion(save.level);
     sayMsg(questionPrompt(q, L, t(L, 'trNode' + (save.node + 1))));
@@ -256,7 +265,7 @@ export function renderTreasure(body, ctx) {
 
   const backBtn = el('button', 'gbtn', BACK_ARROW + esc(t(L, 'gameBack')));
   backBtn.type = 'button';
-  backBtn.addEventListener('click', ctx.back);
+  backBtn.addEventListener('click', () => { clearPending(); ctx.back(); });
 
   actions.appendChild(hintBtn);
   actions.appendChild(backBtn);

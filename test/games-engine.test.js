@@ -214,3 +214,17 @@ describe('status', () => {
     expect(status(s)).toBe('check');
   });
 });
+
+describe('perft', () => {
+  function perft(s, d) {
+    if (d === 0) return 1;
+    let n = 0;
+    for (const m of allLegalMoves(s)) n += perft(applyMove(s, m), d - 1);
+    return n;
+  }
+  it('initial position counts match known perft values', () => {
+    expect(perft(initialState(), 1)).toBe(20);
+    expect(perft(initialState(), 2)).toBe(400);
+    expect(perft(initialState(), 3)).toBe(8902);
+  });
+});
