@@ -7,6 +7,8 @@ import {
   squareName,
 } from './engine.js';
 import { chooseMove, suggestMove } from './bot.js';
+import { glideDelta, arrowPct, arrowHead, confettiSpec, traysFromMoves, prefersReducedMotion } from './fx.js';
+import { playSfx, isSoundOn, setSoundOn } from './sfx.js';
 
 const GLYPH = { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚' };
 const NAME = {
@@ -25,6 +27,9 @@ export function renderChess(body, ctx) {
   let over = false;
   let busyBot = false;
   let botTimer = null;
+  let moves = [];      // [{mv, mover, capT}] — song song với states
+  let lastMove = null; // mv của nước vừa đi (highlight)
+  let fxTimer = null;  // dọn pháo giấy/trái tim
 
   const score = el('span', 'gt-score', t(L, 'chStats').replace('{w}', stats.won).replace('{l}', stats.lost));
   ctx.top.appendChild(score);
@@ -35,6 +40,11 @@ export function renderChess(body, ctx) {
   boardEl.setAttribute('role', 'grid');
   boardEl.setAttribute('aria-label', L === 'en' ? 'Chess board' : 'Bàn cờ');
   const logEl = el('div', 'chess-log');
+  const posEl = el('div', 'chess-pos');
+  const fxEl = el('div', 'chess-fx');
+  const traysEl = el('div', 'trays');
+  const trayW = el('div', 'tray');
+  const trayB = el('div', 'tray');
   const actions = el('div', 'game-actions');
 
   function cur() { return states[states.length - 1]; }
@@ -46,6 +56,32 @@ export function renderChess(body, ctx) {
 
   function clearBotTimer() {
     if (botTimer) { clearTimeout(botTimer); botTimer = null; }
+  }
+
+  function clearFxTimer() {
+    if (fxTimer) { clearTimeout(fxTimer); fxTimer = null; }
+  }
+
+  function clearFx() {
+    clearFxTimer();
+    fxEl.innerHTML = '';
+  }
+
+  function playAndClearFx(ms) {
+    fxTimer = setTimeout(() => {
+      if (fxEl.isConnected) fxEl.innerHTML = '';
+      fxTimer = null;
+    }, ms);
+  }
+
+  function renderTrays() {
+    const { byW, byB } = traysFromMoves(moves);
+    trayW.innerHTML = byW.length
+      ? '<span class="t-label">' + esc(t(L, 'chYouTook')) + '</span><span class="t-pcs b">' + byW.map((tp) => GLYPH[tp]).join('') + '</span>'
+      : '';
+    trayB.innerHTML = byB.length
+      ? '<span class="t-label">' + esc(t(L, 'chBotTook')) + '</span><span class="t-pcs w">' + byB.map((tp) => GLYPH[tp]).join('') + '</span>'
+      : '';
   }
 
   function sayMsg(html, kind) {
@@ -64,6 +100,7 @@ export function renderChess(body, ctx) {
       txt,
       capName: captured ? NAME[L][victim] : null,
       capVal: captured ? VAL[victim] : 0,
+      victim: victim,
     };
   }
 
@@ -93,10 +130,62 @@ export function renderChess(body, ctx) {
       b.addEventListener('click', () => onSquare(sq));
       boardEl.appendChild(b);
     }
+    if (lastMove) {
+      if (boardEl.children[lastMove.from]) boardEl.children[lastMove.from].classList.add('last');
+      if (boardEl.children[lastMove.to]) boardEl.children[lastMove.to].classList.add('last');
+    }
+  }
+
+  function applyGlide(move, victimType) {
+    if (prefersReducedMotion()) return;
+    const bFrom = boardEl.children[move.from];
+    const bTo = boardEl.children[move.to];
+    if (!bFrom || !bTo) return;
+    const piece = bTo.querySelector('.pc');
+    if (piece) {
+      const d = glideDelta(bFrom.getBoundingClientRect(), bTo.getBoundingClientRect());
+      if (d.dx || d.dy) {
+        piece.style.transition = 'none';
+        piece.style.transform = 'translate(' + d.dx + 'px,' + d.dy + 'px)';
+        void piece.offsetWidth; // ép reflow rồi thả transition
+        piece.style.transition = '';
+        piece.style.transform = '';
+      }
+    }
+    if (move.flag === 'castle') {
+      const kingSide = move.to > move.from;
+      const rookFrom = kingSide ? move.from + 3 : move.from - 4;
+      const rookTo = kingSide ? move.from + 1 : move.from - 1;
+      const rookEl = boardEl.children[rookTo] && boardEl.children[rookTo].querySelector('.pc');
+      if (rookEl && boardEl.children[rookFrom]) {
+        const d = glideDelta(boardEl.children[rookFrom].getBoundingClientRect(), boardEl.children[rookTo].getBoundingClientRect());
+        if (d.dx || d.dy) {
+          rookEl.style.transition = 'none';
+          rookEl.style.transform = 'translate(' + d.dx + 'px,' + d.dy + 'px)';
+          void rookEl.offsetWidth;
+          rookEl.style.transition = '';
+          rookEl.style.transform = '';
+        }
+      }
+    }
+    if (victimType) {
+      const r = Math.floor(move.to / 8), c = move.to % 8;
+      // sau applyMove, cur().turn là phe ĐỐI PHƯƠNG của người vừa đi —
+      // quân bị ăn cùng phe với cur().turn nên ghost nhận class tương ứng
+      const ghost = el('div', 'ghost-cap',
+        '<span class="pc ' + (cur().turn === 'w' ? 'w' : 'b') + '">' + GLYPH[victimType] + '</span>');
+      ghost.style.left = (c * 12.5) + '%';
+      ghost.style.top = (r * 12.5) + '%';
+      ghost.style.width = '12.5%';
+      ghost.style.height = '12.5%';
+      fxEl.appendChild(ghost);
+      playAndClearFx(400);
+    }
   }
 
   function onSquare(sq) {
     if (over || busyBot) return;
+    fxEl.innerHTML = '';
     const st = cur();
     if (selected !== null) {
       const mv = targets.find((m) => m.to === sq);
@@ -118,6 +207,10 @@ export function renderChess(body, ctx) {
   function afterMove(stBefore, m) {
     const info = describeMove(stBefore, m);
     logEl.appendChild(el('span', '', esc(info.txt)));
+    moves.push({ mv: m, mover: stBefore.turn, capT: info.victim });
+    lastMove = m;
+    renderTrays();
+    playSfx(info.victim ? 'capture' : 'move');
     const st = cur();
     const s = status(st);
     if (s === 'checkmate') { finish(stBefore.turn); return true; }
@@ -126,17 +219,35 @@ export function renderChess(body, ctx) {
       const who = stBefore.turn === 'w' ? 'chCapture' : 'chAte';
       sayMsg(esc(t(L, who).replace('{name}', info.capName).replace('{n}', info.capVal)), stBefore.turn === 'w' ? 'win' : 'warn');
     } else if (s === 'check') {
+      playSfx('check');
       sayMsg(esc(t(L, 'chCheck')), 'warn');
+    } else if (stBefore.turn === 'b') {
+      sayMsg(esc(t(L, 'chYourTurn')));
     }
     return false;
+  }
+
+  function lastMoveVictim(mv, stBefore) {
+    const isEp = mv.flag === 'ep';
+    return isEp ? 'p' : (stBefore.board[mv.to] ? stBefore.board[mv.to].t : null);
+  }
+
+  function sayThinking() {
+    say.className = 'game-say';
+    say.innerHTML = '<div class="gs-av">' + SPARK_ICON + '</div><div class="gs-text">' +
+      esc(t(L, 'chThinking')) +
+      ' <span class="thinking"><span></span><span></span><span></span></span></div>';
   }
 
   function humanMove(mv) {
     const stBefore = cur();
     states.push(applyMove(stBefore, mv));
     selected = null; targets = []; hintMove = null;
+    fxEl.innerHTML = '';
     draw();
+    applyGlide(mv, lastMoveVictim(mv, stBefore));
     if (afterMove(stBefore, mv)) return;
+    sayThinking();
     busyBot = true;
     botTimer = setTimeout(botMove, 450);
   }
@@ -149,6 +260,7 @@ export function renderChess(body, ctx) {
     if (!mv) { busyBot = false; finish(null); return; }
     states.push(applyMove(stBefore, mv));
     draw();
+    applyGlide(mv, lastMoveVictim(mv, stBefore));
     busyBot = false;
     afterMove(stBefore, mv);
   }
@@ -162,19 +274,54 @@ export function renderChess(body, ctx) {
       sayMsg('🤝 <strong>' + esc(t(L, 'chDraw')) + '</strong>', 'win');
     } else if (winnerSide === 'w') {
       stats.won += 1;
+      playSfx('win');
       sayMsg('🏆 <strong>' + esc(t(L, 'chWin')) + '</strong>', 'win');
+      celebrate();
     } else {
       stats.lost += 1;
+      playSfx('lose');
       sayMsg('💛 ' + esc(t(L, 'chLose')), 'warn');
+      dropHearts();
     }
     persist();
   }
 
+  function celebrate() {
+    if (prefersReducedMotion()) return;
+    boardEl.classList.add('celebrate');
+    for (const p of confettiSpec()) {
+      const bit = el('div', 'confetti-bit');
+      bit.style.left = p.left + '%';
+      bit.style.background = p.color;
+      bit.style.animationDelay = p.delay + 'ms';
+      bit.style.animationDuration = p.duration + 'ms';
+      bit.style.transform = 'rotate(' + p.rotate + 'deg)';
+      fxEl.appendChild(bit);
+    }
+    playAndClearFx(2000);
+  }
+
+  function dropHearts() {
+    if (prefersReducedMotion()) return;
+    for (let i = 0; i < 6; i++) {
+      const h = el('div', 'heart-bit', '💛');
+      h.style.left = (10 + i * 15) + '%';
+      h.style.animationDelay = (i * 120) + 'ms';
+      fxEl.appendChild(h);
+    }
+    playAndClearFx(2200);
+  }
+
   function newGame() {
     clearBotTimer();
+    clearFx();
     states = [initialState()];
+    moves = [];
+    lastMove = null;
     selected = null; targets = []; hintMove = null; over = false; busyBot = false;
+    boardEl.classList.remove('celebrate');
     logEl.innerHTML = '';
+    renderTrays();
     sayMsg(esc(t(L, 'chIntro')));
     draw();
   }
@@ -188,13 +335,17 @@ export function renderChess(body, ctx) {
   undoBtn.addEventListener('click', () => {
     if (busyBot) return;
     clearBotTimer();
-    // lùi về lượt người chơi (trắng): bỏ ít nhất 1 state, pop tiếp tới khi tới lượt trắng
+    clearFx();
     let popped = 0;
     while (states.length > 1 && (popped === 0 || states[states.length - 1].turn !== 'w')) {
       states.pop();
+      if (moves.length) moves.pop();
       popped += 1;
     }
+    lastMove = moves.length ? moves[moves.length - 1].mv : null;
     over = false; selected = null; targets = []; hintMove = null;
+    boardEl.classList.remove('celebrate');
+    renderTrays();
     draw();
     for (let i = 0; i < popped; i++) {
       if (logEl.lastChild) logEl.removeChild(logEl.lastChild);
@@ -208,23 +359,55 @@ export function renderChess(body, ctx) {
     const mv = suggestMove(cur());
     if (!mv) return;
     hintMove = mv;
+    playSfx('hint');
+    draw();
+    drawHintArrow(mv);
     const p = cur().board[mv.from];
     sayMsg(L === 'en'
       ? '💡 Try moving your <strong>' + esc(NAME.en[p.t]) + '</strong> from ' + squareName(mv.from) + ' to ' + squareName(mv.to) + '.'
       : '💡 Thử đưa <strong>' + esc(NAME.vi[p.t]) + '</strong> từ ' + squareName(mv.from) + ' sang ' + squareName(mv.to) + ' nhé.', 'warn');
-    draw();
   });
+
+  function drawHintArrow(mv) {
+    if (prefersReducedMotion()) return;
+    const bRect = boardEl.getBoundingClientRect();
+    const fromR = boardEl.children[mv.from].getBoundingClientRect();
+    const toR = boardEl.children[mv.to].getBoundingClientRect();
+    const g = arrowPct(bRect, fromR, toR);
+    const head = arrowHead(g.x1, g.y1, g.x2, g.y2);
+    fxEl.innerHTML =
+      '<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">' +
+      '<polyline class="hint-arrow-line" points="' + g.x1 + ',' + g.y1 + ' ' + g.x2 + ',' + g.y2 + '"/>' +
+      '<polygon class="hint-arrow-head" points="' + head + '"/></svg>';
+  }
 
   const backBtn = el('button', 'gbtn', BACK_ARROW + esc(t(L, 'gameBack')));
   backBtn.type = 'button';
-  backBtn.addEventListener('click', () => { clearBotTimer(); ctx.back(); });
+  backBtn.addEventListener('click', () => { clearBotTimer(); clearFx(); ctx.back(); });
+
+  const soundBtn = el('button', 'gbtn ghost', isSoundOn() ? '🔊' : '🔇');
+  soundBtn.type = 'button';
+  soundBtn.setAttribute('aria-label', t(L, isSoundOn() ? 'soundOn' : 'soundOff'));
+  soundBtn.addEventListener('click', () => {
+    const on = !isSoundOn();
+    setSoundOn(on);
+    soundBtn.textContent = on ? '🔊' : '🔇';
+    soundBtn.setAttribute('aria-label', t(L, on ? 'soundOn' : 'soundOff'));
+    if (on) playSfx('hint');
+  });
 
   actions.appendChild(newBtn);
   actions.appendChild(undoBtn);
   actions.appendChild(hintBtn);
   actions.appendChild(backBtn);
+  actions.appendChild(soundBtn);
 
-  wrap.appendChild(boardEl);
+  posEl.appendChild(boardEl);
+  posEl.appendChild(fxEl);
+  traysEl.appendChild(trayW);
+  traysEl.appendChild(trayB);
+  wrap.appendChild(posEl);
+  wrap.appendChild(traysEl);
   wrap.appendChild(logEl);
 
   body.appendChild(say);
@@ -233,4 +416,5 @@ export function renderChess(body, ctx) {
 
   sayMsg(esc(t(L, 'chIntro')));
   draw();
+  renderTrays();
 }
