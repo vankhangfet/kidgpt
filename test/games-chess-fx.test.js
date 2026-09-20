@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   glideDelta, arrowPct, arrowHead, confettiSpec, traysFromMoves, prefersReducedMotion,
 } from '../public/games/chess/fx.js';
@@ -105,5 +105,83 @@ describe('prefersReducedMotion', () => {
   it('defaults to false without matchMedia', () => {
     expect(prefersReducedMotion({})).toBe(false);
     expect(prefersReducedMotion(null)).toBe(false);
+  });
+});
+
+import { playSfx, isSoundOn, setSoundOn } from '../public/games/chess/sfx.js';
+
+describe('sfx', () => {
+  const store = new Map();
+  beforeEach(() => {
+    store.clear();
+    globalThis.localStorage = {
+      getItem: (k) => (store.has(k) ? store.get(k) : null),
+      setItem: (k, v) => store.set(k, String(v)),
+      removeItem: (k) => store.delete(k),
+    };
+  });
+
+  it('defaults to on and toggles persistently', () => {
+    expect(isSoundOn()).toBe(true);
+    setSoundOn(false);
+    expect(isSoundOn()).toBe(false);
+    setSoundOn(true);
+    expect(isSoundOn()).toBe(true);
+  });
+
+  it('is silent and never throws without AudioContext', () => {
+    const AC = globalThis.AudioContext;
+    delete globalThis.AudioContext;
+    delete globalThis.webkitAudioContext;
+    expect(() => playSfx('move')).not.toThrow();
+    globalThis.AudioContext = AC;
+  });
+
+  it('drives oscillators when a context exists', () => {
+    let started = 0;
+    class FakeGain {
+      constructor() { this.gain = { setValueAtTime() {}, exponentialRampToValueAtTime() {} }; }
+      connect() {}
+    }
+    class FakeOsc {
+      constructor() { this.type = ''; this.frequency = { value: 0 }; }
+      connect() {}
+      start() { started += 1; }
+      stop() {}
+    }
+    globalThis.AudioContext = class {
+      constructor() { this.state = 'running'; this.currentTime = 0; this.destination = {}; }
+      createOscillator() { return new FakeOsc(); }
+      createGain() { return new FakeGain(); }
+    };
+    playSfx('move');
+    expect(started).toBe(1);
+    playSfx('win');
+    expect(started).toBe(4); // arpeggio 3 nốt
+    playSfx('nope');
+    expect(started).toBe(4); // hiệu ứng lạ → bỏ qua
+  });
+
+  it('muted sound plays nothing', () => {
+    let started = 0;
+    class FakeGain {
+      constructor() { this.gain = { setValueAtTime() {}, exponentialRampToValueAtTime() {} }; }
+      connect() {}
+    }
+    class FakeOsc {
+      constructor() { this.type = ''; this.frequency = { value: 0 }; }
+      connect() {}
+      start() { started += 1; }
+      stop() {}
+    }
+    globalThis.AudioContext = class {
+      constructor() { this.state = 'running'; this.currentTime = 0; this.destination = {}; }
+      createOscillator() { return new FakeOsc(); }
+      createGain() { return new FakeGain(); }
+    };
+    setSoundOn(false);
+    playSfx('move');
+    expect(started).toBe(0);
+    setSoundOn(true);
   });
 });
