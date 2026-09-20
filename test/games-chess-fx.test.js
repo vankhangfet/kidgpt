@@ -30,6 +30,30 @@ describe('arrowPct', () => {
       expect(v).toBeLessThanOrEqual(100);
     }
   });
+
+  it('one-square move keeps the head pointing at the target (default pad)', () => {
+    const board = { left: 0, top: 0, width: 400, height: 400 };
+    const from = { left: 0, top: 300, width: 50, height: 50 };   // center 6.25, 81.25
+    const to = { left: 0, top: 250, width: 50, height: 50 };     // center 6.25, 68.75 (1 ô lên trên)
+    const g = arrowPct(board, from, to);
+    expect(g).toEqual({ x1: 6.25, y1: 79, x2: 6.25, y2: 75 });
+    expect(Math.abs(g.y2 - 68.75)).toBeLessThan(Math.abs(g.y1 - 68.75)); // đầu mũi tên gần đích hơn
+  });
+
+  it('two-square move keeps the head pointing at the target (default pad)', () => {
+    const board = { left: 0, top: 0, width: 400, height: 400 };
+    const from = { left: 0, top: 300, width: 50, height: 50 };
+    const to = { left: 0, top: 200, width: 50, height: 50 };     // 2 ô lên trên
+    const g = arrowPct(board, from, to);
+    expect(g.y2).toBeLessThan(g.y1);
+    expect(Math.abs(g.y2 - 56.25)).toBeLessThan(Math.abs(g.y1 - 56.25));
+  });
+
+  it('returns zeros for an unlayouted board', () => {
+    expect(arrowPct({ left: 0, top: 0, width: 0, height: 0 },
+      { left: 0, top: 0, width: 50, height: 50 },
+      { left: 300, top: 0, width: 50, height: 50 })).toEqual({ x1: 0, y1: 0, x2: 0, y2: 0 });
+  });
 });
 
 describe('arrowHead', () => {

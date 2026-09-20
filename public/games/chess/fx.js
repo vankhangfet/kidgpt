@@ -5,9 +5,12 @@ export function glideDelta(fromRect, toRect) {
   return { dx: fromRect.left - toRect.left, dy: fromRect.top - toRect.top };
 }
 
-// Toạ độ % (SVG viewBox 0 0 100 100) cho mũi tên ô nguồn → ô đích, lùi padPct
-// hai đầu để không chạm tâm quân và chừa chỗ đầu mũi tên.
+// Toạ độ % (SVG viewBox 0 0 100 100) cho mũi tên ô nguồn → ô đích.
+// Pad bị kẹp theo độ dài để nước đi ngắn (1 ô, mã, 2 ô) không bị đảo
+// đầu mũi tên; đuôi lùi `p` từ tâm nguồn, đầu lùi `p + headLen` từ tâm đích.
+// Điều kiện: from ≠ to, boardRect đã layout (width/height > 0).
 export function arrowPct(boardRect, fromRect, toRect, padPct) {
+  if (!(boardRect.width > 0) || !(boardRect.height > 0)) return { x1: 0, y1: 0, x2: 0, y2: 0 };
   const pct = (rect) => ({
     x: ((rect.left + rect.width / 2 - boardRect.left) / boardRect.width) * 100,
     y: ((rect.top + rect.height / 2 - boardRect.top) / boardRect.height) * 100,
@@ -15,14 +18,15 @@ export function arrowPct(boardRect, fromRect, toRect, padPct) {
   const a = pct(fromRect);
   const b = pct(toRect);
   const len = Math.hypot(b.x - a.x, b.y - a.y) || 1;
-  const p = padPct || 14;
+  const p = Math.min(padPct || 6, Math.max(0, (len - 8) / 2));
+  const headLen = Math.min(4, Math.max(0, len - 2 * p - 1));
   const ux = (b.x - a.x) / len;
   const uy = (b.y - a.y) / len;
   return {
     x1: a.x + ux * p,
     y1: a.y + uy * p,
-    x2: b.x - ux * (p + 4),
-    y2: b.y - uy * (p + 4),
+    x2: b.x - ux * (p + headLen),
+    y2: b.y - uy * (p + headLen),
   };
 }
 
@@ -48,7 +52,7 @@ export function confettiSpec(rand) {
   const out = [];
   for (let i = 0; i < 24; i++) {
     out.push({
-      left: Math.round(r() * 100),
+      left: Math.floor(r() * 100),
       delay: Math.round(r() * 300),
       color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
       rotate: Math.round(r() * 360),
