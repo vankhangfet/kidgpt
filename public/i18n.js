@@ -85,6 +85,12 @@ export const STRINGS = {
     chLose: 'Bot thắng ván này — không sao cả, thử lại nhé. Bạn làm được!',
     chDraw: 'Hết nước đi — ván hòa! Giỏi lắm!',
     chStats: 'Thắng {w} · Thua {l}',
+    chThinking: 'Sparkle đang nghĩ',
+    chYourTurn: 'Đến lượt bạn nhé!',
+    chYouTook: 'Quân bạn ăn',
+    chBotTook: 'Bot ăn',
+    soundOn: 'Bật âm thanh',
+    soundOff: 'Tắt âm thanh',
   },
   en: {
     tagline: 'I help you think — not just answer',
@@ -170,6 +176,12 @@ export const STRINGS = {
     chLose: 'The bot won this one — that\'s okay, try again. You can do it!',
     chDraw: 'No moves left — it\'s a draw! Well played!',
     chStats: 'Won {w} · Lost {l}',
+    chThinking: 'Sparkle is thinking',
+    chYourTurn: 'Your turn!',
+    chYouTook: 'You captured',
+    chBotTook: 'Bot captured',
+    soundOn: 'Sound on',
+    soundOff: 'Sound off',
   },
 };
 

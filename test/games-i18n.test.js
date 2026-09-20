@@ -6,6 +6,7 @@ const SHARED = [
   'wqCast', 'dgCase', 'dgAccuse', 'dgNextCase',
   'chIntro', 'chNewGame', 'chUndo', 'chHint', 'chCheck', 'chCapture', 'chAte',
   'chWin', 'chLose', 'chDraw', 'chStats',
+  'chThinking', 'chYourTurn', 'chYouTook', 'chBotTook', 'soundOn', 'soundOff',
 ];
 
 describe('games i18n keys', () => {
