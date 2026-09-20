@@ -68,6 +68,7 @@ export function renderChess(body, ctx) {
   }
 
   function playAndClearFx(ms) {
+    clearFxTimer();
     fxTimer = setTimeout(() => {
       if (fxEl.isConnected) fxEl.innerHTML = '';
       fxTimer = null;
@@ -173,7 +174,7 @@ export function renderChess(body, ctx) {
       // sau applyMove, cur().turn là phe ĐỐI PHƯƠNG của người vừa đi —
       // quân bị ăn cùng phe với cur().turn nên ghost nhận class tương ứng
       const ghost = el('div', 'ghost-cap',
-        '<span class="pc ' + (cur().turn === 'w' ? 'w' : 'b') + '">' + GLYPH[victimType] + '</span>');
+        '<span class="pc ' + (cur().turn === 'w' ? 'w' : 'b') + '" aria-hidden="true">' + GLYPH[victimType] + '</span>');
       ghost.style.left = (c * 12.5) + '%';
       ghost.style.top = (r * 12.5) + '%';
       ghost.style.width = '12.5%';
@@ -186,6 +187,7 @@ export function renderChess(body, ctx) {
   function onSquare(sq) {
     if (over || busyBot) return;
     fxEl.innerHTML = '';
+    hintMove = null;
     const st = cur();
     if (selected !== null) {
       const mv = targets.find((m) => m.to === sq);
@@ -204,8 +206,7 @@ export function renderChess(body, ctx) {
     draw();
   }
 
-  function afterMove(stBefore, m) {
-    const info = describeMove(stBefore, m);
+  function afterMove(stBefore, m, info) {
     logEl.appendChild(el('span', '', esc(info.txt)));
     moves.push({ mv: m, mover: stBefore.turn, capT: info.victim });
     lastMove = m;
@@ -215,21 +216,16 @@ export function renderChess(body, ctx) {
     const s = status(st);
     if (s === 'checkmate') { finish(stBefore.turn); return true; }
     if (s === 'stalemate') { finish(null); return true; }
-    if (info.capName) {
+    if (s === 'check') {
+      if (!info.victim) playSfx('check');
+      sayMsg(esc(t(L, 'chCheck')), 'warn');
+    } else if (info.capName) {
       const who = stBefore.turn === 'w' ? 'chCapture' : 'chAte';
       sayMsg(esc(t(L, who).replace('{name}', info.capName).replace('{n}', info.capVal)), stBefore.turn === 'w' ? 'win' : 'warn');
-    } else if (s === 'check') {
-      playSfx('check');
-      sayMsg(esc(t(L, 'chCheck')), 'warn');
     } else if (stBefore.turn === 'b') {
       sayMsg(esc(t(L, 'chYourTurn')));
     }
     return false;
-  }
-
-  function lastMoveVictim(mv, stBefore) {
-    const isEp = mv.flag === 'ep';
-    return isEp ? 'p' : (stBefore.board[mv.to] ? stBefore.board[mv.to].t : null);
   }
 
   function sayThinking() {
@@ -241,12 +237,13 @@ export function renderChess(body, ctx) {
 
   function humanMove(mv) {
     const stBefore = cur();
+    const info = describeMove(stBefore, mv);
     states.push(applyMove(stBefore, mv));
     selected = null; targets = []; hintMove = null;
     fxEl.innerHTML = '';
     draw();
-    applyGlide(mv, lastMoveVictim(mv, stBefore));
-    if (afterMove(stBefore, mv)) return;
+    applyGlide(mv, info.victim);
+    if (afterMove(stBefore, mv, info)) return;
     sayThinking();
     busyBot = true;
     botTimer = setTimeout(botMove, 450);
@@ -258,11 +255,12 @@ export function renderChess(body, ctx) {
     const stBefore = cur();
     const mv = chooseMove(stBefore);
     if (!mv) { busyBot = false; finish(null); return; }
+    const info = describeMove(stBefore, mv);
     states.push(applyMove(stBefore, mv));
     draw();
-    applyGlide(mv, lastMoveVictim(mv, stBefore));
+    applyGlide(mv, info.victim);
     busyBot = false;
-    afterMove(stBefore, mv);
+    afterMove(stBefore, mv, info);
   }
 
   function finish(winnerSide) {
@@ -295,7 +293,6 @@ export function renderChess(body, ctx) {
       bit.style.background = p.color;
       bit.style.animationDelay = p.delay + 'ms';
       bit.style.animationDuration = p.duration + 'ms';
-      bit.style.transform = 'rotate(' + p.rotate + 'deg)';
       fxEl.appendChild(bit);
     }
     playAndClearFx(2000);
@@ -304,7 +301,7 @@ export function renderChess(body, ctx) {
   function dropHearts() {
     if (prefersReducedMotion()) return;
     for (let i = 0; i < 6; i++) {
-      const h = el('div', 'heart-bit', '💛');
+      const h = el('div', 'heart-bit', '<span aria-hidden="true">💛</span>');
       h.style.left = (10 + i * 15) + '%';
       h.style.animationDelay = (i * 120) + 'ms';
       fxEl.appendChild(h);

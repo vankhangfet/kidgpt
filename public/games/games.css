@@ -359,6 +359,7 @@ button.level-pill { cursor: pointer; }
 .confetti-bit {
   position: absolute; top: -4%; width: 8px; height: 12px; border-radius: 2px;
   animation: confetti-fall linear forwards;
+  animation-fill-mode: backwards;
 }
 @keyframes heart-fall {
   0% { transform: translateY(-4%) scale(1); opacity: .95; }
