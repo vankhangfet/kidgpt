@@ -78,11 +78,13 @@ export function renderChess(body, ctx) {
   function renderTrays() {
     const { byW, byB } = traysFromMoves(moves);
     trayW.innerHTML = byW.length
-      ? '<span class="t-label">' + esc(t(L, 'chYouTook')) + '</span><span class="t-pcs b">' + byW.map((tp) => GLYPH[tp]).join('') + '</span>'
+      ? '<span class="t-label">' + esc(t(L, 'chYouTook')) + '</span><span class="t-pcs b">' + byW.slice(0, 15).map((tp) => GLYPH[tp]).join('') + '</span>'
       : '';
     trayB.innerHTML = byB.length
-      ? '<span class="t-label">' + esc(t(L, 'chBotTook')) + '</span><span class="t-pcs w">' + byB.map((tp) => GLYPH[tp]).join('') + '</span>'
+      ? '<span class="t-label">' + esc(t(L, 'chBotTook')) + '</span><span class="t-pcs w">' + byB.slice(0, 15).map((tp) => GLYPH[tp]).join('') + '</span>'
       : '';
+    trayW.style.display = byW.length ? '' : 'none';
+    trayB.style.display = byB.length ? '' : 'none';
   }
 
   function sayMsg(html, kind) {
@@ -294,6 +296,7 @@ export function renderChess(body, ctx) {
       bit.style.background = p.color;
       bit.style.animationDelay = p.delay + 'ms';
       bit.style.animationDuration = p.duration + 'ms';
+      bit.style.setProperty('--cr', (p.rotate + 540) + 'deg');
       fxEl.appendChild(bit);
     }
     playAndClearFx(2000);

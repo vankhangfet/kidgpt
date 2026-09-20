@@ -292,6 +292,7 @@ button.level-pill { cursor: pointer; }
 
 /* nước vừa đi */
 .sq.last::before { content: ''; position: absolute; inset: 0; background: rgba(232, 195, 90, .3); }
+.sq.last .pc { position: relative; z-index: 1; }
 
 /* vua bị chiếu nhấp nháy rồi giữ đỏ */
 @keyframes chk-pulse {
@@ -343,7 +344,7 @@ button.level-pill { cursor: pointer; }
 /* khay quân bị bắt */
 .trays { display: grid; gap: 4px; max-width: 460px; margin-inline: auto; width: 100%; }
 .tray {
-  display: flex; align-items: center; gap: 8px; min-height: 30px;
+  display: flex; align-items: center; gap: 8px; min-height: 30px; flex-wrap: wrap;
   font-size: clamp(18px, 4vw, 26px); line-height: 1;
 }
 .tray .t-label { font-family: var(--font-display); font-weight: 700; font-size: 12px; color: var(--muted); white-space: nowrap; }
@@ -354,7 +355,7 @@ button.level-pill { cursor: pointer; }
 /* pháo giấy + trái tim */
 @keyframes confetti-fall {
   0% { transform: translateY(-4%) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(115%) rotate(540deg); opacity: 0; }
+  100% { transform: translateY(115%) rotate(var(--cr, 540deg)); opacity: 0; }
 }
 .confetti-bit {
   position: absolute; top: -4%; width: 8px; height: 12px; border-radius: 2px;
