@@ -186,6 +186,7 @@ export function renderChess(body, ctx) {
 
   function onSquare(sq) {
     if (over || busyBot) return;
+    clearFxTimer();
     fxEl.innerHTML = '';
     hintMove = null;
     const st = cur();
@@ -352,6 +353,7 @@ export function renderChess(body, ctx) {
   const hintBtn = el('button', 'gbtn hint', '💡 ' + esc(t(L, 'chHint')));
   hintBtn.type = 'button';
   hintBtn.addEventListener('click', () => {
+    clearFxTimer();
     if (over || busyBot || cur().turn !== 'w') return;
     const mv = suggestMove(cur());
     if (!mv) return;
