@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Sparkle Games — design mockup</title>
+  <meta name="description" content="Static design mockup of the three Sparkle Tutor games: Treasure Number, Word Quest, and Puzzle Detective." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+  /* ---- tokens (identical to sparkle-tutor.html) ------------------ */
+  :root{
+    --bg:oklch(98% 0.012 235);--bg-2:oklch(95% 0.02 235);--surface:oklch(100% 0 0);
+    --fg:oklch(30% 0.06 265);--muted:oklch(52% 0.04 265);--border:oklch(90% 0.02 250);
+    --child:oklch(66% 0.16 32);--child-soft:oklch(94% 0.05 40);
+    --tutor:oklch(64% 0.11 195);--tutor-soft:oklch(95% 0.035 195);
+    --success:oklch(68% 0.15 150);--success-soft:oklch(94% 0.06 150);
+    --warn:oklch(78% 0.14 75);--warn-soft:oklch(95% 0.06 80);
+    --math:oklch(64% 0.14 265);--reading:oklch(66% 0.15 340);--science:oklch(64% 0.13 160);--curio:oklch(72% 0.14 60);
+    --games:oklch(60% 0.17 300);--treasure-sea:oklch(62% 0.12 220);--treasure-sand:oklch(88% 0.07 85);--gold:oklch(80% 0.15 85);--gem:oklch(66% 0.15 180);--magic:oklch(58% 0.16 300);--magic-soft:oklch(95% 0.04 300);--sepia:oklch(55% 0.08 60);--sepia-soft:oklch(94% 0.04 70);
+    --radius:18px;--radius-lg:26px;--radius-pill:999px;
+    --font-display:'Baloo 2','Fredoka','Nunito','Segoe UI Rounded',system-ui,-apple-system,sans-serif;
+    --font-body:'Nunito',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+    --shadow-sm:0 2px 6px oklch(50% 0.05 265 / 0.08);--shadow-md:0 8px 24px oklch(50% 0.08 265 / 0.12);--shadow-pop:0 12px 40px oklch(50% 0.1 265 / 0.16);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%}
+  body{font-family:var(--font-body);color:var(--fg);background:radial-gradient(1100px 640px at 92% -12%,var(--tutor-soft),transparent 58%),var(--bg);-webkit-font-smoothing:antialiased;font-size:16px;line-height:1.5;padding-bottom:60px}
+  h1,h2,h3,.display{font-family:var(--font-display);letter-spacing:-0.01em}
+
+  /* ---- page scaffolding (mockup only) --------------------------- */
+  .page-head{max-width:900px;margin:0 auto;padding:34px clamp(16px,4vw,28px) 8px}
+  .page-head .eyebrow{font-family:var(--font-display);font-weight:800;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:var(--games)}
+  .page-head h1{font-size:clamp(28px,5vw,40px);margin-top:6px}
+  .page-head p{color:var(--muted);font-size:16px;max-width:60ch;margin-top:8px}
+  .page-head .principle{margin-top:14px;display:inline-flex;align-items:center;gap:10px;background:var(--tutor-soft);color:var(--tutor);border-radius:var(--radius-pill);padding:10px 18px;font-family:var(--font-display);font-weight:700;font-size:14px}
+  .page-head .principle svg{width:20px;height:20px}
+  .section-label{max-width:900px;margin:38px auto 0;padding:0 clamp(16px,4vw,28px);display:flex;align-items:center;gap:12px}
+  .section-label .n{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-family:var(--font-display);font-weight:800;font-size:15px;color:#fff;flex:none}
+  .section-label h2{font-size:22px}
+  .section-label .tag{margin-left:auto;font-family:var(--font-display);font-weight:700;font-size:12px;color:var(--muted);border:2px solid var(--border);border-radius:var(--radius-pill);padding:4px 12px}
+  .frame{max-width:900px;margin:14px auto 0;padding:0 clamp(16px,4vw,28px)}
+  .frame-inner{background:radial-gradient(700px 300px at 50% -40%,var(--tutor-soft),transparent 60%);border:2px dashed var(--border);border-radius:calc(var(--radius-lg) + 6px);padding:clamp(14px,3vw,26px);display:flex;flex-direction:column;align-items:stretch;gap:16px}
+
+  /* ---- shared game chrome (from tutor) -------------------------- */
+  .game-say{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;background:var(--tutor-soft);border-radius:var(--radius);padding:12px 14px}
+  .game-say .gs-av{width:34px;height:34px;border-radius:50%;background:#fff;color:var(--tutor);display:grid;place-items:center}
+  .game-say .gs-av svg{width:20px;height:20px}
+  .game-say .gs-text{font-size:15px;line-height:1.5}
+  .game-say .gs-text strong{font-weight:800}
+  .game-say.warn{background:var(--warn-soft)}
+  .game-say.win{background:var(--success-soft)}
+  .opt-row{display:flex;flex-wrap:wrap;gap:10px}
+  .opt{min-width:60px;min-height:52px;padding:8px 18px;border-radius:16px;border:2px solid var(--border);background:var(--surface);font-family:var(--font-display);font-weight:800;font-size:20px;color:var(--fg);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .12s,border-color .12s,background .12s}
+  .opt:hover:not(:disabled){transform:translateY(-2px);border-color:var(--treasure-sea)}
+  .opt.right{border-color:var(--success);background:var(--success-soft);color:oklch(42% 0.12 150)}
+  .opt.wrong{border-color:var(--warn);background:var(--warn-soft)}
+  .opt.reason{font-size:15px;min-width:0;text-align:left;justify-content:flex-start}
+  .game-actions{display:flex;flex-wrap:wrap;gap:8px}
+  .gbtn{border:2px solid var(--border);background:var(--surface);color:var(--fg);border-radius:var(--radius-pill);padding:9px 16px;min-height:44px;font-family:var(--font-display);font-weight:700;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:transform .12s,border-color .12s,background .12s}
+  .gbtn:hover{transform:translateY(-1px)}
+  .gbtn svg{width:16px;height:16px}
+  .gbtn.primary{background:var(--tutor);color:#fff;border-color:var(--tutor)}
+  .gbtn.hint{background:var(--warn-soft);border-color:color-mix(in oklch,#fff 55%,var(--warn));color:oklch(52% 0.13 60)}
+  .level-row{display:flex;gap:8px;flex-wrap:wrap}
+  .level-pill{font-family:var(--font-display);font-weight:700;font-size:12px;padding:5px 12px;border-radius:var(--radius-pill);background:var(--bg-2);color:var(--muted);border:2px solid transparent}
+  .level-pill.active{background:color-mix(in oklch,#fff 80%,var(--treasure-sea));color:var(--treasure-sea);border-color:var(--treasure-sea)}
+
+  /* ---- game hub cards ------------------------------------------- */
+  .game-hub{display:grid;gap:12px}
+  @media (min-width:620px){.game-hub{grid-template-columns:repeat(3,1fr)}}
+  .game-card{text-align:left;border:2px solid var(--border);background:var(--surface);border-radius:var(--radius-lg);padding:16px;cursor:pointer;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow-sm);transition:transform .14s ease,border-color .14s,box-shadow .14s}
+  .game-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:currentColor}
+  .game-card .gc-badge{width:52px;height:52px;border-radius:16px;flex:none;display:grid;place-items:center;font-size:30px;line-height:1}
+  .game-card.treasure{color:var(--treasure-sea)}
+  .game-card.treasure .gc-badge{background:color-mix(in oklch,#fff 82%,var(--treasure-sea))}
+  .game-card.wordquest{color:var(--magic)}
+  .game-card.wordquest .gc-badge{background:var(--magic-soft)}
+  .game-card.detective{color:var(--sepia)}
+  .game-card.detective .gc-badge{background:var(--sepia-soft)}
+  .game-card .gc-title{font-family:var(--font-display);font-weight:800;font-size:18px;color:var(--fg)}
+  .game-card .gc-desc{font-size:14px;color:var(--muted);line-height:1.4}
+  .game-card .gc-go{margin-top:auto;align-self:flex-start;font-family:var(--font-display);font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:6px}
+  .game-card .gc-go svg{width:15px;height:15px}
+
+  /* ---- game panel ----------------------------------------------- */
+  .game{align-self:stretch;width:100%;border-radius:var(--radius-lg);border:2px solid var(--border);background:var(--surface);box-shadow:var(--shadow-md);overflow:hidden}
+  .game-top{display:flex;align-items:center;gap:12px;padding:14px 18px;color:#fff}
+  .game.treasure .game-top{background:linear-gradient(120deg,var(--treasure-sea),oklch(58% 0.13 200))}
+  .game.wordquest .game-top{background:linear-gradient(120deg,var(--magic),oklch(52% 0.16 320))}
+  .game.detective .game-top{background:linear-gradient(120deg,var(--sepia),oklch(45% 0.07 50))}
+  .game-top .gt-emoji{font-size:26px;line-height:1}
+  .game-top .gt-title{font-family:var(--font-display);font-weight:800;font-size:18px}
+  .game-top .gt-sub{font-size:12.5px;opacity:.9;font-weight:700}
+  .game-top .gt-score{margin-left:auto;display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.2);border-radius:var(--radius-pill);padding:6px 12px;font-family:var(--font-display);font-weight:800;font-size:14px;white-space:nowrap}
+  .game-body{padding:18px;display:grid;gap:14px}
+
+  /* ---- treasure map --------------------------------------------- */
+  .treasure-map{position:relative;background:radial-gradient(120px 90px at 82% 26%,color-mix(in oklch,#fff 40%,var(--treasure-sand)),transparent 70%),linear-gradient(180deg,oklch(78% 0.09 210),oklch(70% 0.11 220));border-radius:var(--radius);padding:16px;overflow:hidden}
+  .tm-path{display:flex;align-items:center;justify-content:space-between;gap:4px;position:relative}
+  .tm-node{flex:1;min-width:0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .tm-node .tm-dot{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:24px;line-height:1;background:rgba(255,255,255,.75);border:3px solid rgba(255,255,255,.9);box-shadow:var(--shadow-sm)}
+  .tm-node .tm-label{font-family:var(--font-display);font-weight:800;font-size:11px;color:oklch(32% 0.06 240)}
+  .tm-node.done .tm-dot{background:var(--success-soft);border-color:var(--success)}
+  .tm-node.current .tm-dot{background:var(--gold);border-color:#fff;transform:scale(1.14)}
+  .tm-node.locked .tm-dot{opacity:.55;filter:grayscale(.4)}
+  .tm-line{position:absolute;top:23px;left:8%;right:8%;height:4px;background:repeating-linear-gradient(90deg,#fff 0 8px,transparent 8px 16px);opacity:.7;z-index:0}
+  .tm-path .tm-node{z-index:1}
+  .gem-tray{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .gem-tray .gt-cap{font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--muted)}
+  .gems{display:flex;gap:4px;flex-wrap:wrap}
+  .gem{width:20px;height:20px;border-radius:4px 4px 6px 6px;background:linear-gradient(160deg,color-mix(in oklch,#fff 45%,var(--gem)),var(--gem));box-shadow:inset 0 -3px 0 oklch(45% 0.12 190 / .5)}
+  .gem.ghost{background:transparent;box-shadow:inset 0 0 0 2px var(--border)}
+
+  /* ---- word quest ----------------------------------------------- */
+  .wq-scene{background:radial-gradient(200px 120px at 20% 0%,var(--magic-soft),transparent 70%),var(--bg);border-radius:var(--radius);padding:14px}
+  .wq-slots{display:flex;flex-wrap:wrap;gap:8px;min-height:62px;padding:10px;border-radius:var(--radius);background:color-mix(in oklch,#fff 70%,var(--magic-soft));border:2px dashed color-mix(in oklch,#fff 40%,var(--magic))}
+  .wq-slot{min-width:64px;min-height:48px;padding:6px;border-radius:12px;border:2px dashed color-mix(in oklch,#fff 55%,var(--magic));display:grid;place-items:center;background:rgba(255,255,255,.6)}
+  .wq-slot.filled{border-style:solid}
+  .wq-bank{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;min-height:52px}
+  .word-card{padding:0 16px;min-height:48px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:20px;background:linear-gradient(170deg,#fff,color-mix(in oklch,#fff 78%,var(--magic)));color:oklch(38% 0.14 300);border:2px solid color-mix(in oklch,#fff 55%,var(--magic));box-shadow:var(--shadow-sm);cursor:grab;user-select:none}
+  .word-card.locked{cursor:default}
+  .wq-crystal{display:grid;place-items:center}
+  .wq-crystal svg{width:120px;height:auto}
+
+  /* ---- detective ------------------------------------------------ */
+  .suspects{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .suspect{flex:1 1 90px;max-width:130px;text-align:center;border:2px solid var(--border);border-radius:var(--radius);padding:12px 8px;background:var(--surface);cursor:pointer}
+  .suspect:hover{transform:translateY(-3px);border-color:var(--sepia)}
+  .suspect .sp-face{font-size:40px;line-height:1}
+  .suspect .sp-name{font-family:var(--font-display);font-weight:800;font-size:14px;margin-top:4px}
+  .suspect.accused{border-color:var(--sepia);background:var(--sepia-soft)}
+  .suspect.culprit{border-color:var(--success);background:var(--success-soft)}
+  .suspect.cleared{opacity:.5}
+  .clue-list{display:grid;gap:8px}
+  .clue{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;border:2px solid var(--border);border-radius:var(--radius);padding:10px 12px;background:var(--sepia-soft)}
+  .clue .cl-face{font-size:24px;line-height:1}
+  .clue .cl-text{font-size:14.5px;line-height:1.45}
+  .clue .cl-text .cl-who{font-family:var(--font-display);font-weight:800}
+  .clue.flag{border-color:var(--warn)}
+
+  .caption{max-width:900px;margin:10px auto 0;padding:0 clamp(16px,4vw,28px);color:var(--muted);font-size:13.5px;display:flex;gap:8px;align-items:flex-start}
+  .caption b{color:var(--fg);font-family:var(--font-display)}
+  .backlink{max-width:900px;margin:40px auto 0;padding:0 clamp(16px,4vw,28px)}
+  .backlink a{font-family:var(--font-display);font-weight:700;color:var(--tutor);text-decoration:none;display:inline-flex;gap:8px;align-items:center;border:2px solid var(--border);border-radius:var(--radius-pill);padding:10px 18px}
+  .backlink a:hover{border-color:var(--tutor)}
+  </style>
+</head>
+<body>
+
+  <header class="page-head">
+    <div class="eyebrow">Sparkle Tutor · Games</div>
+    <h1>Game design mockup</h1>
+    <p>Static designs of the three games as they appear inside the tutor chat. Every game keeps the core rule: Sparkle guides the child to reason it out and never hands over the answer first.</p>
+    <div class="principle">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10c.7.7 1 1.3 1 2h6c0-.7.3-1.3 1-2a6 6 0 0 0-4-10Z"/></svg>
+      Solve · Explore · Collect · Unlock · Celebrate
+    </div>
+  </header>
+
+  <!-- ============ GAME HUB ============ -->
+  <div class="section-label">
+    <span class="n" style="background:var(--games)">0</span>
+    <h2>The game hub</h2>
+    <span class="tag">Games chip → picker</span>
+  </div>
+  <div class="frame"><div class="frame-inner">
+    <div class="game-say">
+      <div class="gs-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="3.2"/></svg></div>
+      <div class="gs-text">Playtime! 🎮 Pick a game — I'll be right beside you, helping you <strong>think it through</strong>, never just handing over the answer.</div>
+    </div>
+    <div class="game-hub">
+      <div class="game-card treasure">
+        <span class="gc-badge">🗺️</span>
+        <div class="gc-title">Treasure Number</div>
+        <div class="gc-desc">Solve math to unlock the Lost Treasure. Explore an island, collect gems, open the magic gate.</div>
+        <span class="gc-go">Play <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="game-card wordquest">
+        <span class="gc-badge">📚</span>
+        <div class="gc-title">Word Quest</div>
+        <div class="gc-desc">Drag the mixed-up words back into order to cast the magic spell and grow your crystal.</div>
+        <span class="gc-go">Play <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="game-card detective">
+        <span class="gc-badge">🕵️</span>
+        <div class="gc-title">Puzzle Detective</div>
+        <div class="gc-desc">Read the clues, reason step by step with Sparkle, and crack the mystery yourself.</div>
+        <span class="gc-go">Play <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+    </div>
+  </div></div>
+  <div class="caption"><b>Note ·</b> Three colour-coded games, each with its own themed world. Cards lift on hover and match the game's header gradient.</div>
+
+  <!-- ============ 1. TREASURE NUMBER ============ -->
+  <div class="section-label">
+    <span class="n" style="background:var(--treasure-sea)">1</span>
+    <h2>Treasure Number — The Lost Treasure</h2>
+    <span class="tag">Math adventure</span>
+  </div>
+  <div class="frame"><div class="frame-inner">
+    <div class="game treasure">
+      <div class="game-top">
+        <span class="gt-emoji">🗺️</span>
+        <span><div class="gt-title">Treasure Number</div><div class="gt-sub">The Lost Treasure</div></span>
+        <span class="gt-score">💎 7</span>
+      </div>
+      <div class="game-body">
+        <div class="level-row">
+          <span class="level-pill active">Lv 1 · Little Explorer</span>
+          <span class="level-pill">Lv 2 · Treasure Hunter</span>
+          <span class="level-pill">Lv 3 · Master Explorer</span>
+        </div>
+        <div class="treasure-map">
+          <div class="tm-path">
+            <div class="tm-line"></div>
+            <div class="tm-node done"><div class="tm-dot">🏝️</div><div class="tm-label">Island</div></div>
+            <div class="tm-node done"><div class="tm-dot">🌴</div><div class="tm-label">Jungle</div></div>
+            <div class="tm-node current"><div class="tm-dot">🔐</div><div class="tm-label">Magic Gate</div></div>
+            <div class="tm-node locked"><div class="tm-dot">🏴‍☠️</div><div class="tm-label">Pirate Cave</div></div>
+            <div class="tm-node locked"><div class="tm-dot">💎</div><div class="tm-label">Treasure</div></div>
+          </div>
+        </div>
+        <div class="gem-tray">
+          <span class="gt-cap">Gems collected</span>
+          <div class="gems">
+            <span class="gem"></span><span class="gem"></span><span class="gem"></span><span class="gem"></span><span class="gem"></span><span class="gem"></span><span class="gem"></span>
+            <span class="gem ghost"></span><span class="gem ghost"></span><span class="gem ghost"></span><span class="gem ghost"></span><span class="gem ghost"></span>
+          </div>
+        </div>
+        <div class="game-say">
+          <div class="gs-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="3.2"/></svg></div>
+          <div class="gs-text">🧩 <strong>Magic Gate</strong><br>The gate needs a code: <strong>6 + 6</strong>. What is the code?</div>
+        </div>
+        <div class="opt-row">
+          <button class="opt">11</button>
+          <button class="opt">12</button>
+          <button class="opt">13</button>
+        </div>
+        <div class="game-say warn">
+          <div class="gs-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10c.7.7 1 1.3 1 2h6c0-.7.3-1.3 1-2a6 6 0 0 0-4-10Z"/></svg></div>
+          <div class="gs-text">💡 Double the number 6. What is 6 and another 6 put together?</div>
+        </div>
+        <div class="game-actions">
+          <button class="gbtn hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10c.7.7 1 1.3 1 2h6c0-.7.3-1.3 1-2a6 6 0 0 0-4-10Z"/></svg>I need a hint</button>
+          <button class="gbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Choose another game</button>
+        </div>
+      </div>
+    </div>
+  </div></div>
+  <div class="caption"><b>The tutor rule ·</b> A wrong tap never reveals the answer — Sparkle offers a first hint, then a step-by-step count-on hint, and only confirms after the child solves it. Right answers pour gems into the tray and bounce the character to the next checkpoint with confetti.</div>
+
+  <!-- ============ 2. WORD QUEST ============ -->
+  <div class="section-label">
+    <span class="n" style="background:var(--magic)">2</span>
+    <h2>Word Quest — The Magic Sentence</h2>
+    <span class="tag">Drag &amp; drop English</span>
+  </div>
+  <div class="frame"><div class="frame-inner">
+    <div class="game wordquest">
+      <div class="game-top">
+        <span class="gt-emoji">📚</span>
+        <span><div class="gt-title">Word Quest</div><div class="gt-sub">The Magic Sentence</div></span>
+        <span class="gt-score">🔮 2</span>
+      </div>
+      <div class="game-body">
+        <div class="level-row">
+          <span class="level-pill">Lv 1 · Word Garden</span>
+          <span class="level-pill active" style="background:color-mix(in oklch,#fff 80%,var(--magic));color:var(--magic);border-color:var(--magic)">Lv 2 · Sentence Village</span>
+          <span class="level-pill">Lv 3 · Grammar Castle</span>
+          <span class="level-pill">Lv 4 · Time Tower</span>
+          <span class="level-pill">Lv 5 · Story Kingdom</span>
+        </div>
+        <div class="game-say">
+          <div class="gs-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="3.2"/></svg></div>
+          <div class="gs-text">🧙‍♀️ The Magic Book lost its words! Drag the word cards into the <strong>right order</strong> to cast the spell.</div>
+        </div>
+        <div class="wq-scene">
+          <div class="wq-slots">
+            <div class="wq-slot filled"><span class="word-card">The</span></div>
+            <div class="wq-slot filled"><span class="word-card">dog</span></div>
+            <div class="wq-slot filled"><span class="word-card">is</span></div>
+            <div class="wq-slot"></div>
+          </div>
+          <div class="wq-bank">
+            <span class="word-card">running</span>
+          </div>
+        </div>
+        <div class="game-say warn">
+          <div class="gs-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10c.7.7 1 1.3 1 2h6c0-.7.3-1.3 1-2a6 6 0 0 0-4-10Z"/></svg></div>
+          <div class="gs-text">🪄 One slot is still empty — say it out loud: “The dog …” — what is the dog doing?</div>
+        </div>
+        <div class="game-actions">
+          <button class="gbtn primary">✨ Cast the spell</button>
+          <button class="gbtn hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10c.7.7 1 1.3 1 2h6c0-.7.3-1.3 1-2a6 6 0 0 0-4-10Z"/></svg>I need a hint</button>
+          <button class="gbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Choose another game</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- success state of the same game -->
+    <div class="game wordquest">
+      <div class="game-top">
+        <span class="gt-emoji">📚</span>
+        <span><div class="gt-title">Word Quest</div><div class="gt-sub">Spell activated!</div></span>
+        <span class="gt-score">🔮 3</span>
+      </div>
+      <div class="game-body">
+        <div class="wq-scene">
+          <div class="wq-slots">
+            <div class="wq-slot filled"><span class="word-card locked">The</span></div>
+            <div class="wq-slot filled"><span class="word-card locked">dog</span></div>
+            <div class="wq-slot filled"><span class="word-card locked">is</span></div>
+            <div class="wq-slot filled"><span class="word-card locked">running</span></div>
+          </div>
+        </div>
+        <div class="wq-crystal">
+          <svg viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="cry" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="oklch(78% 0.12 300)"/>
+                <stop offset="1" stop-color="oklch(52% 0.18 320)"/>
+              </linearGradient>
+            </defs>
+            <polygon points="60,8 96,52 76,142 44,142 24,52" fill="url(#cry)" stroke="#fff" stroke-width="2.5"/>
+            <polygon points="60,8 76,142 60,120" fill="#fff" opacity="0.25"/>
+            <polygon points="24,52 60,8 60,120" fill="#fff" opacity="0.14"/>
+            <path d="M60 8 24 52M60 8 96 52M24 52 60 120M96 52 60 120" stroke="#fff" stroke-width="1.2" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="game-say win">
+          <div class="gs-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="3.2"/></svg></div>
+          <div class="gs-text">✨ <strong>Magic Spell Activated!</strong> “The dog is running.” 🔮 Your crystal grows! A new area unlocks!</div>
+        </div>
+        <div class="game-actions">
+          <button class="gbtn primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Next area</button>
+          <button class="gbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Choose another game</button>
+        </div>
+      </div>
+    </div>
+  </div></div>
+  <div class="caption"><b>Interaction ·</b> Drag a card into a slot, or tap-then-tap on touch. A wrong order gets a Socratic nudge (“which word comes first?”), never the finished sentence. Casting a correct spell locks the cards, grows a crystal, and unlocks the next area.</div>
+
+  <!-- ============ 3. PUZZLE DETECTIVE ============ -->
+  <div class="section-label">
+    <span class="n" style="background:var(--sepia)">3</span>
+    <h2>Puzzle Detective — The Missing Cookie</h2>
+    <span class="tag">Reasoning · the wow moment</span>
+  </div>
+  <div class="frame"><div class="frame-inner">
+    <div class="game detective">
+      <div class="game-top">
+        <span class="gt-emoji">🍪</span>
+        <span><div class="gt-title">Puzzle Detective</div><div class="gt-sub">The Missing Cookie</div></span>
+        <span class="gt-score">🔎 Case 1/3</span>
+      </div>
+      <div class="game-body">
+        <div class="game-say">
+          <div class="gs-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="3.2"/></svg></div>
+          <div class="gs-text">🔎 <strong>Detective Sparkle needs your help!</strong><br>Someone took the last cookie from the kitchen! Read each clue, then help me <strong>reason</strong> — I won't tell you who did it, we'll figure it out together.</div>
+        </div>
+        <div class="suspects">
+          <div class="suspect"><div class="sp-face">🐶</div><div class="sp-name">Max</div></div>
+          <div class="suspect"><div class="sp-face">🐱</div><div class="sp-name">Luna</div></div>
+          <div class="suspect"><div class="sp-face">🐰</div><div class="sp-name">Bunny</div></div>
+        </div>
+        <div class="clue-list">
+          <div class="clue"><div class="cl-face">🐶</div><div class="cl-text"><span class="cl-who">Max:</span> “I was playing outside the whole time.”</div></div>
+          <div class="clue flag"><div class="cl-face">🐱</div><div class="cl-text"><span class="cl-who">Luna:</span> “I saw Bunny in the kitchen.”</div></div>
+          <div class="clue flag"><div class="cl-face">🐰</div><div class="cl-text"><span class="cl-who">Bunny:</span> “I never went into the kitchen.”</div></div>
+        </div>
+        <div class="game-say">
+          <div class="gs-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="3.2"/></svg></div>
+          <div class="gs-text"><strong>Step 1.</strong> Two clues disagree. Luna says she <em>saw Bunny in the kitchen</em>, but Bunny says <em>“I never went into the kitchen.”</em> What does that tell us?</div>
+        </div>
+        <div class="opt-row">
+          <button class="opt reason">Both can't be true — someone isn't telling the truth</button>
+          <button class="opt reason">They both must be true</button>
+          <button class="opt reason">It tells us nothing</button>
+        </div>
+        <div class="game-actions">
+          <button class="gbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Choose another game</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- accuse / solved state -->
+    <div class="game detective">
+      <div class="game-top">
+        <span class="gt-emoji">🍪</span>
+        <span><div class="gt-title">Puzzle Detective</div><div class="gt-sub">Case closed</div></span>
+        <span class="gt-score">🔎 Case 1/3</span>
+      </div>
+      <div class="game-body">
+        <div class="game-say">
+          <div class="gs-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="3.2"/></svg></div>
+          <div class="gs-text">🕵️ You've reasoned it through. Now make your call — <strong>who took the cookie?</strong></div>
+        </div>
+        <div class="suspects">
+          <div class="suspect cleared"><div class="sp-face">🐶</div><div class="sp-name">Max</div></div>
+          <div class="suspect cleared"><div class="sp-face">🐱</div><div class="sp-name">Luna</div></div>
+          <div class="suspect culprit"><div class="sp-face">🐰</div><div class="sp-name">Bunny</div></div>
+        </div>
+        <div class="game-say win">
+          <div class="gs-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="3.2"/></svg></div>
+          <div class="gs-text">🎉 <strong>Case closed!</strong> The clues that clashed pointed to <strong>Bunny</strong> — a witness saw Bunny there, but Bunny denied it. You reasoned it out yourself, detective!</div>
+        </div>
+        <div class="game-actions">
+          <button class="gbtn primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Next mystery</button>
+          <button class="gbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Choose another game</button>
+        </div>
+      </div>
+    </div>
+  </div></div>
+  <div class="caption"><b>The reasoning engine ·</b> Instead of one question with three answers, the child investigates. Sparkle walks through the contradiction step by step, gives a hint on a wrong choice, and only lets the child accuse after the logic is clear. Case files continue into the Blue Backpack (reading) and the Secret Code (math: 5+3, 12−7, 2×4 → 8-5-8).</div>
+
+  <div class="backlink">
+    <a href="sparkle-tutor.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Open the live tutor — tap the Games chip to play</a>
+  </div>
+
+</body>
+</html>
