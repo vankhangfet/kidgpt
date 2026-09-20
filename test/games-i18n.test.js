@@ -6,6 +6,7 @@ const SHARED = [
   'wqCast', 'dgCase', 'dgAccuse', 'dgNextCase',
   'chIntro', 'chNewGame', 'chUndo', 'chHint', 'chCheck', 'chCapture', 'chAte',
   'chWin', 'chLose', 'chDraw', 'chStats',
+  'signInEyebrow', 'signInH1', 'signInLede', 'trustSafe', 'trustParent', 'trustPrivate', 'signInConnecting', 'signInSafe', 'benefit1T', 'benefit1D', 'benefit2T', 'benefit2D', 'benefit3T', 'benefit3D', 'gateFoot',
   'chThinking', 'chYourTurn', 'chYouTook', 'chBotTook', 'soundOn', 'soundOff',
 ];
 

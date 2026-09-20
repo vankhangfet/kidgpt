@@ -48,7 +48,7 @@ describe('subjects', () => {
   it('welcomeBody contains strong in both langs, no other string contains markup', () => {
     expect(STRINGS.vi.welcomeBody).toMatch(/<strong>.*<\/strong>/);
     expect(STRINGS.en.welcomeBody).toMatch(/<strong>.*<\/strong>/);
-    const MARKUP_OK = new Set(['welcomeBody', 'gamesSay']);
+    const MARKUP_OK = new Set(['welcomeBody', 'gamesSay', 'signInH1']);
     function scan(obj, path) {
       for (const [k, v] of Object.entries(obj)) {
         if (typeof v === 'string') {
