@@ -377,6 +377,6 @@ button.level-pill { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   .pc { transition: none; }
   .sq.chk, .sq.hintmark, .chessboard.celebrate .pc.w,
-  .confetti-bit, .heart-bit, .ghost-cap { animation: none; }
+  .confetti-bit, .heart-bit, .ghost-cap, .gs-text .thinking span { animation: none; }
   .hint-arrow-line { animation: none; }
 }
