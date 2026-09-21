@@ -87,9 +87,9 @@ function renderLogin() {
           '<h1>' + t(lang, 'signInH1') + '</h1>' +
           '<p class="g-lede">' + esc(t(lang, 'signInLede')) + '</p>' +
           '<div class="g-trust">' +
-            '<span class="tchip">' + ICON_SHIELD + esc(t(lang, 'trustSafe')) + '</span>' +
-            '<span class="tchip">' + ICON_CHECK + esc(t(lang, 'trustParent')) + '</span>' +
-            '<span class="tchip">' + ICON_LOCK + esc(t(lang, 'trustPrivate')) + '</span>' +
+            '<span class="tchip"><span aria-hidden="true">' + ICON_SHIELD + '</span>' + esc(t(lang, 'trustSafe')) + '</span>' +
+            '<span class="tchip"><span aria-hidden="true">' + ICON_CHECK + '</span>' + esc(t(lang, 'trustParent')) + '</span>' +
+            '<span class="tchip"><span aria-hidden="true">' + ICON_LOCK + '</span>' + esc(t(lang, 'trustPrivate')) + '</span>' +
           '</div>' +
         '</div>' +
       '</section>' +
@@ -101,7 +101,7 @@ function renderLogin() {
           GOOGLE_ICON + SPINNER +
           '<span id="gate-signin-label">' + esc(t(lang, 'signInButton')) + '</span></button>' +
         '<p class="gate-privacy gate-error" id="gate-signin-error" hidden></p>' +
-        '<div class="g-safe">' + ICON_SHIELD + esc(t(lang, 'signInSafe')) + '</div>' +
+        '<div class="g-safe"><span aria-hidden="true">' + ICON_SHIELD + '</span>' + esc(t(lang, 'signInSafe')) + '</div>' +
         '<ul class="g-benefits">' +
           '<li><span class="g-ico i1" aria-hidden="true">' + ICON_NOTE + '</span>' +
             '<span><strong>' + esc(t(lang, 'benefit1T')) + '</strong><span class="b-d">' + esc(t(lang, 'benefit1D')) + '</span></span></li>' +
