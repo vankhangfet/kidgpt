@@ -66,3 +66,10 @@ cầu login/link project), mở URL local (mặc định http://localhost:3000).
 - [ ] Chess: chấm highlight nước hợp lệ (vòng đỏ = ăn quân); nhập thành + phong cấp tự hậu; Gợi ý/Đi lại/Ván mới; Đi lại sau khi thắng vẫn về lượt người; W/L lưu qua reload
 - [ ] Chess animations: quân trượt mượt khi đi, ghost + khay quân bị ăn, mũi tên gợi ý lấp lánh, ô nước vừa đi vàng nhạt, vua chiếu nhấp nháy, "đang nghĩ…" 3 chấm, pháo giấy khi thắng; 🔊/🔇 hoạt động qua reload
 - [ ] Private mode (block localStorage): game vẫn chơi, không crash console
+
+## Gate redesign
+
+- [ ] Màn đăng nhập: split-card thế giới (sun/sao/mây/đồi, Sparkle + robot + cú + 4 token bay) + panel phải; 2 ngôn ngữ; nút Google có spinner "Đang kết nối…" khi chờ popup, reset khi đóng popup
+- [ ] Trust chips ẩn <520px; xếp dọc <860px; full-bleed <400px; reduced-motion tắt sạch animation
+- [ ] Chọn hồ sơ & quản lý hồ sơ: badge Sparkle trên card, card hover lift, avatar gradient, nút Lưu gradient coral; luồng tạo/sửa/xóa hồ sơ hoạt động như cũ
+- [ ] Nền đốm confetti bay hiện ở cả 3 màn và không biến mất khi chuyển màn

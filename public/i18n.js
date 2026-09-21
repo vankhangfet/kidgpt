@@ -30,7 +30,7 @@ export const STRINGS = {
     signInButton: 'Đăng nhập bằng Google',
     signInEyebrow: 'Học mà chơi, chơi mà học',
     signInH1: 'Nơi các con <em>tự suy nghĩ</em>, không chỉ nhận đáp án',
-    signInLede: 'Sparkle đồng hành cùng bé từng bước— với gợi ý nhẹ nhàng, trò chơi và lời động viên dành cho tuổi 6–12.',
+    signInLede: 'Sparkle đồng hành cùng bé từng bước — với gợi ý nhẹ nhàng, trò chơi và lời động viên dành cho tuổi 6–12.',
     trustSafe: 'An toàn cho trẻ, không quảng cáo',
     trustParent: 'Phụ huynh kiểm soát',
     trustPrivate: 'Riêng tư thiết kế sẵn',

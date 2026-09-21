@@ -538,9 +538,9 @@ h1, h2, h3, .display { font-family: var(--font-display); letter-spacing: -0.01em
 .step .body .tip svg, .bubble .lead svg { width: 16px; height: 16px; vertical-align: -2px; }
 
 /* keyboard focus */
-.btn-google:focus-visible, .profile-card:focus-visible, .age-band-btn:focus-visible,
+.g-google:focus-visible, .profile-card:focus-visible, .age-band-btn:focus-visible,
 .btn-ghost:focus-visible, .subject:focus-visible, .chip:focus-visible,
-.send:focus-visible, .suggests button:focus-visible {
+.send:focus-visible, .suggests button:focus-visible, .gate-save:focus-visible {
   outline: 3px solid var(--tutor); outline-offset: 2px;
 }
 

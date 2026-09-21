@@ -1,6 +1,11 @@
 import { esc } from './util.js';
 import { t } from './i18n.js';
 import {
+  starSvg, cloudSvg, HILLS, SPARKLE_MASCOT, HERO_BADGE, HERO_BADGE_SAD,
+  BUDDY_ROBOT, BUDDY_OWL, GOOGLE_ICON, SPINNER, BRAND_MARK,
+  ICON_SHIELD, ICON_CHECK, ICON_LOCK, ICON_NOTE, ICON_GAMES, ICON_PERSON, ICON_BOOK, ICON_ATOM,
+} from './gate-art.js';
+import {
   isFirebaseConfigured, signInWithGoogle, signOutGoogle, watchAuth,
   listProfiles, createProfile, updateProfile, deleteProfile, MAX_PROFILES,
 } from './auth.js';
@@ -16,6 +21,8 @@ let currentLang = () => (document.documentElement.lang === 'en' ? 'en' : 'vi');
 export function initGate(callbacks) {
   onUnlock = callbacks.onUnlock;
   gateEl = document.getElementById('gate');
+  gateEl.innerHTML = '<div class="g-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>'
+    + '<div class="g-screens"></div>';
   if (!isFirebaseConfigured()) {
     renderConfigError();
     return;
@@ -46,7 +53,7 @@ function renderLoadError() {
   const lang = currentLang();
   show(
     '<div class="gate-card">' +
-      '<h2 class="gate-title">😞</h2>' +
+      HERO_BADGE_SAD +
       '<p class="gate-body">' + esc(t(lang, 'actionError')) + '</p>' +
       '<div class="gate-actions"><button class="btn-ghost" id="gate-retry" type="button">' + esc(t(lang, 'retry')) + '</button></div>' +
     '</div>');
@@ -54,36 +61,78 @@ function renderLoadError() {
 }
 
 function renderConfigError() {
-  show('<div class="gate-card"><h2 class="gate-title">⚠️</h2><p class="gate-body">' +
+  show('<div class="gate-card">' + HERO_BADGE_SAD + '<p class="gate-body">' +
     esc(t(currentLang(), 'gateConfigError')) + '</p></div>');
 }
 
 function renderLogin() {
   const lang = currentLang();
   show(
-    '<div class="gate-card">' +
-      '<div class="gate-logo" aria-hidden="true">✨</div>' +
-      '<h2 class="gate-title">' + esc(t(lang, 'signInTitle')) + '</h2>' +
-      '<p class="gate-body">' + esc(t(lang, 'signInBody')) + '</p>' +
-      '<button class="btn-google" id="gate-signin" type="button">' +
-        '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#4285F4" d="M23 12.2c0-.8-.1-1.6-.2-2.3H12v4.4h6.2c-.3 1.4-1.1 2.6-2.3 3.4v2.8h3.7c2.2-2 3.4-5 3.4-8.3z"/><path fill="#34A853" d="M12 24c3.1 0 5.8-1 7.7-2.8l-3.7-2.8c-1 .7-2.3 1.1-4 1.1-3.1 0-5.7-2.1-6.6-4.9H1.6v2.9C3.6 21.3 7.5 24 12 24z"/><path fill="#FBBC05" d="M5.4 14.6c-.2-.7-.4-1.5-.4-2.3s.1-1.6.4-2.3V7.1H1.6C.6 8.9 0 10.9 0 12.3s.6 3.4 1.6 5.2l3.8-2.9z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.3-3.3C17.9 1.2 15.1 0 12 0 7.5 0 3.6 2.7 1.6 6.6l3.8 2.9c.9-2.8 3.5-4.7 6.6-4.7z"/></svg>' +
-        '<span>' + esc(t(lang, 'signInButton')) + '</span>' +
-      '</button>' +
-      '<p class="gate-privacy gate-error" id="gate-signin-error" hidden></p>' +
-      '<p class="gate-privacy">' + esc(t(lang, 'signInPrivacy')) + '</p>' +
-    '</div>');
-  document.getElementById('gate-signin').addEventListener('click', async () => {
-    const errEl = document.getElementById('gate-signin-error');
+    '<main class="g-auth" aria-label="KidGPT">' +
+      '<section class="g-world">' +
+        '<div class="g-sky" aria-hidden="true"><span class="g-sun"></span>' +
+          starSvg('s1') + starSvg('s2') + starSvg('s3') + starSvg('s4') +
+          cloudSvg('c1') + cloudSvg('c2') + cloudSvg('c3') + HILLS + '</div>' +
+        '<div class="g-brand"><span class="g-brand-mark" aria-hidden="true">' + BRAND_MARK + '</span>' +
+          '<span class="g-brand-name">Kid<span>GPT</span></span></div>' +
+        '<div class="g-stage" aria-hidden="true">' +
+          '<span class="g-token t1">7</span>' +
+          '<span class="g-token t2">' + ICON_BOOK + '</span>' +
+          '<span class="g-token t3">' + ICON_ATOM + '</span>' +
+          '<span class="g-token t4">A</span>' +
+          BUDDY_ROBOT + BUDDY_OWL + SPARKLE_MASCOT +
+        '</div>' +
+        '<div class="g-copy">' +
+          '<span class="g-eyebrow">' + esc(t(lang, 'signInEyebrow')) + '</span>' +
+          '<h1>' + t(lang, 'signInH1') + '</h1>' +
+          '<p class="g-lede">' + esc(t(lang, 'signInLede')) + '</p>' +
+          '<div class="g-trust">' +
+            '<span class="tchip">' + ICON_SHIELD + esc(t(lang, 'trustSafe')) + '</span>' +
+            '<span class="tchip">' + ICON_CHECK + esc(t(lang, 'trustParent')) + '</span>' +
+            '<span class="tchip">' + ICON_LOCK + esc(t(lang, 'trustPrivate')) + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</section>' +
+      '<section class="g-panel">' +
+        '<div class="g-hero">' + HERO_BADGE +
+          '<h2>' + esc(t(lang, 'signInTitle')) + '</h2>' +
+          '<p>' + esc(t(lang, 'signInBody')) + '</p></div>' +
+        '<button class="g-google" id="gate-signin" type="button" data-state="idle">' +
+          GOOGLE_ICON + SPINNER +
+          '<span id="gate-signin-label">' + esc(t(lang, 'signInButton')) + '</span></button>' +
+        '<p class="gate-privacy gate-error" id="gate-signin-error" hidden></p>' +
+        '<div class="g-safe">' + ICON_SHIELD + esc(t(lang, 'signInSafe')) + '</div>' +
+        '<ul class="g-benefits">' +
+          '<li><span class="g-ico i1" aria-hidden="true">' + ICON_NOTE + '</span>' +
+            '<span><strong>' + esc(t(lang, 'benefit1T')) + '</strong><span class="b-d">' + esc(t(lang, 'benefit1D')) + '</span></span></li>' +
+          '<li><span class="g-ico i2" aria-hidden="true">' + ICON_GAMES + '</span>' +
+            '<span><strong>' + esc(t(lang, 'benefit2T')) + '</strong><span class="b-d">' + esc(t(lang, 'benefit2D')) + '</span></span></li>' +
+          '<li><span class="g-ico i3" aria-hidden="true">' + ICON_PERSON + '</span>' +
+            '<span><strong>' + esc(t(lang, 'benefit3T')) + '</strong><span class="b-d">' + esc(t(lang, 'benefit3D')) + '</span></span></li>' +
+        '</ul>' +
+        '<p class="g-foot"><b>' + esc(t(lang, 'gateFoot')) + '</b></p>' +
+      '</section>' +
+    '</main>');
+  const btn = document.getElementById('gate-signin');
+  const label = document.getElementById('gate-signin-label');
+  const errEl = document.getElementById('gate-signin-error');
+  btn.addEventListener('click', async () => {
+    if (btn.dataset.state !== 'idle') return;
+    btn.dataset.state = 'loading';
+    label.textContent = t(lang, 'signInConnecting');
     errEl.textContent = '';
     errEl.hidden = true;
     try {
-      await signInWithGoogle();
+      await signInWithGoogle(); // thành công: watchAuth tự re-render gate
     } catch (e) {
       const code = (e && e.code) || '';
       if (!code.includes('popup-closed-by-user') && !code.includes('cancelled-popup-request')) {
         errEl.textContent = t(lang, 'signInError');
         errEl.hidden = false;
       }
+    } finally {
+      btn.dataset.state = 'idle';
+      label.textContent = t(lang, 'signInButton');
     }
   });
 }
@@ -102,6 +151,7 @@ function renderPicker(profiles) {
   const lang = currentLang();
   show(
     '<div class="gate-card gate-wide">' +
+      HERO_BADGE +
       '<h2 class="gate-title">' + esc(t(lang, 'chooseProfile')) + '</h2>' +
       '<p class="gate-body">' + esc(t(lang, 'chooseProfileLead')) + '</p>' +
       '<div class="profile-grid">' + profiles.map((p) => profileCard(p, lang)).join('') + '</div>' +
@@ -139,6 +189,7 @@ function renderManager(profiles, firstTime, errorMsg) {
   show(
     '<div class="gate-card gate-wide">' +
       (errorMsg ? '<p class="gate-privacy gate-error">' + esc(errorMsg) + '</p>' : '') +
+      HERO_BADGE +
       '<h2 class="gate-title">' + esc(t(lang, firstTime ? 'addProfile' : 'manageProfiles')) + '</h2>' +
       (profiles.length
         ? '<div class="profile-list">' + profiles.map((p) =>
@@ -228,7 +279,8 @@ function renderManager(profiles, firstTime, errorMsg) {
 }
 
 function show(html) {
-  gateEl.innerHTML = html;
+  const screens = gateEl.querySelector('.g-screens');
+  screens.innerHTML = html;
   gateEl.hidden = false;
   const app = document.querySelector('.app');
   if (app && 'inert' in app) app.inert = true;
@@ -237,7 +289,8 @@ function show(html) {
 }
 function hide() {
   gateEl.hidden = true;
-  gateEl.innerHTML = '';
+  const screens = gateEl.querySelector('.g-screens');
+  if (screens) screens.innerHTML = '';
   const app = document.querySelector('.app');
   if (app && 'inert' in app) app.inert = false;
 }
