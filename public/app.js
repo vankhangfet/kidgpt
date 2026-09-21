@@ -2,6 +2,7 @@ import { esc, checkAnswer } from './util.js';
 import { renderAid } from './aids.js';
 import { t, SUBJECTS, subjectLabel, placeholderFor, suggestsFor, STRINGS, resolveLang } from './i18n.js';
 import { initGate, reopenGate } from './gate.js';
+import { HERO_BADGE } from './gate-art.js';
 import { getAuthToken } from './auth.js';
 import { showGames, hideGames, refreshGames } from './games/hub.js';
 
@@ -450,6 +451,12 @@ function applyLang() {
 
 function welcome() {
   addMsg('tutor', (b) => {
+    const badge = document.createElement('div');
+    badge.className = 'welcome-badge';
+    badge.setAttribute('aria-hidden', 'true');
+    badge.innerHTML = HERO_BADGE;
+    b.appendChild(badge);
+
     const lead = document.createElement('p');
     lead.className = 'lead';
     lead.textContent = t(lang, 'welcomeLead');
