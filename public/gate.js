@@ -91,30 +91,15 @@ function renderLogin() {
   refreshFn = renderLogin;
   show(
     '<main class="g-auth" aria-label="KidGPT">' +
-      '<section class="g-world">' +
-        '<div class="g-sky" aria-hidden="true"><span class="g-sun"></span>' +
-          starSvg('s1') + starSvg('s2') + starSvg('s3') + starSvg('s4') +
-          cloudSvg('c1') + cloudSvg('c2') + cloudSvg('c3') + HILLS + '</div>' +
-        '<div class="g-brand"><span class="g-brand-mark" aria-hidden="true">' + BRAND_MARK + '</span>' +
-          '<span class="g-brand-name">Kid<span>GPT</span></span></div>' +
-        '<div class="g-stage" aria-hidden="true">' +
-          '<span class="g-token t1">7</span>' +
-          '<span class="g-token t2">' + ICON_BOOK + '</span>' +
-          '<span class="g-token t3">' + ICON_ATOM + '</span>' +
-          '<span class="g-token t4">A</span>' +
-          BUDDY_ROBOT + BUDDY_OWL + SPARKLE_MASCOT +
-        '</div>' +
-        '<div class="g-copy">' +
-          '<span class="g-eyebrow">' + esc(t(lang, 'signInEyebrow')) + '</span>' +
-          '<h1>' + t(lang, 'signInH1') + '</h1>' +
-          '<p class="g-lede">' + esc(t(lang, 'signInLede')) + '</p>' +
-          '<div class="g-trust">' +
-            '<span class="tchip"><span aria-hidden="true">' + ICON_SHIELD + '</span>' + esc(t(lang, 'trustSafe')) + '</span>' +
-            '<span class="tchip"><span aria-hidden="true">' + ICON_CHECK + '</span>' + esc(t(lang, 'trustParent')) + '</span>' +
-            '<span class="tchip"><span aria-hidden="true">' + ICON_LOCK + '</span>' + esc(t(lang, 'trustPrivate')) + '</span>' +
-          '</div>' +
-        '</div>' +
-      '</section>' +
+      worldSection(
+        '<span class="g-eyebrow">' + esc(t(lang, 'signInEyebrow')) + '</span>' +
+        '<h1>' + t(lang, 'signInH1') + '</h1>' +
+        '<p class="g-lede">' + esc(t(lang, 'signInLede')) + '</p>' +
+        '<div class="g-trust">' +
+          '<span class="tchip"><span aria-hidden="true">' + ICON_SHIELD + '</span>' + esc(t(lang, 'trustSafe')) + '</span>' +
+          '<span class="tchip"><span aria-hidden="true">' + ICON_CHECK + '</span>' + esc(t(lang, 'trustParent')) + '</span>' +
+          '<span class="tchip"><span aria-hidden="true">' + ICON_LOCK + '</span>' + esc(t(lang, 'trustPrivate')) + '</span>' +
+        '</div>') +
       '<section class="g-panel">' +
         '<div class="g-hero">' + HERO_BADGE +
           '<h2>' + esc(t(lang, 'signInTitle')) + '</h2>' +
@@ -169,20 +154,42 @@ function profileCard(p, lang) {
   '</button>';
 }
 
+// Cột "thế giới KidGPT" dùng chung: cảnh trời + sân khấu mascot + phần copy.
+// copyHtml là nội dung .g-copy (đã esc sẵn nơi cần) — mỗi màn tự renders.
+function worldSection(copyHtml) {
+  return '<section class="g-world">' +
+    '<div class="g-sky" aria-hidden="true"><span class="g-sun"></span>' +
+      starSvg('s1') + starSvg('s2') + starSvg('s3') + starSvg('s4') +
+      cloudSvg('c1') + cloudSvg('c2') + cloudSvg('c3') + HILLS + '</div>' +
+    '<div class="g-brand"><span class="g-brand-mark" aria-hidden="true">' + BRAND_MARK + '</span>' +
+      '<span class="g-brand-name">Kid<span>GPT</span></span></div>' +
+    '<div class="g-stage" aria-hidden="true">' +
+      '<span class="g-token t1">7</span>' +
+      '<span class="g-token t2">' + ICON_BOOK + '</span>' +
+      '<span class="g-token t3">' + ICON_ATOM + '</span>' +
+      '<span class="g-token t4">A</span>' +
+      BUDDY_ROBOT + BUDDY_OWL + SPARKLE_MASCOT +
+    '</div>' +
+    '<div class="g-copy">' + copyHtml + '</div>' +
+  '</section>';
+}
+
 function renderPicker(profiles) {
   const lang = currentLang();
   refreshFn = () => renderPicker(profiles);
   show(
-    '<div class="gate-card gate-wide">' +
-      HERO_BADGE +
-      '<h2 class="gate-title">' + esc(t(lang, 'chooseProfile')) + '</h2>' +
-      '<p class="gate-body">' + esc(t(lang, 'chooseProfileLead')) + '</p>' +
-      '<div class="profile-grid">' + profiles.map((p) => profileCard(p, lang)).join('') + '</div>' +
-      '<div class="gate-actions">' +
-        '<button class="btn-ghost" id="gate-manage" type="button">' + esc(t(lang, 'manageProfiles')) + '</button>' +
-        '<button class="btn-ghost" id="gate-logout" type="button">' + esc(t(lang, 'signOut')) + '</button>' +
-      '</div>' +
-    '</div>');
+    '<main class="g-auth compact">' +
+      worldSection(
+        '<h1>' + esc(t(lang, 'chooseProfile')) + '</h1>' +
+        '<p class="g-lede">' + esc(t(lang, 'chooseProfileLead')) + '</p>') +
+      '<section class="g-panel">' +
+        '<div class="profile-grid">' + profiles.map((p) => profileCard(p, lang)).join('') + '</div>' +
+        '<div class="gate-actions">' +
+          '<button class="btn-ghost" id="gate-manage" type="button">' + esc(t(lang, 'manageProfiles')) + '</button>' +
+          '<button class="btn-ghost" id="gate-logout" type="button">' + esc(t(lang, 'signOut')) + '</button>' +
+        '</div>' +
+      '</section>' +
+    '</main>');
   gateEl.querySelectorAll('.profile-card').forEach((card) => {
     card.addEventListener('click', () => {
       const p = profiles.find((x) => x.id === card.dataset.id);
@@ -211,33 +218,36 @@ function renderManager(profiles, firstTime, errorMsg) {
   refreshFn = () => renderManager(profiles, firstTime);
   editingId = null;
   show(
-    '<div class="gate-card gate-wide">' +
-      (errorMsg ? '<p class="gate-privacy gate-error">' + esc(errorMsg) + '</p>' : '') +
-      HERO_BADGE +
-      '<h2 class="gate-title">' + esc(t(lang, firstTime ? 'addProfile' : 'manageProfiles')) + '</h2>' +
-      (profiles.length
-        ? '<div class="profile-list">' + profiles.map((p) =>
-            '<div class="profile-row" style="--pc:' + (PROFILE_COLORS[p.color % 8] || PROFILE_COLORS[0]) + '">' +
-              '<span class="profile-row-name">' + esc(p.name) + '</span>' +
-              '<span class="profile-row-band">' + esc(t(lang, p.ageBand === '6-8' ? 'ageBand6to8' : 'ageBand9to12')) + '</span>' +
-              '<button class="chip" data-edit="' + esc(p.id) + '" type="button">' + esc(t(lang, 'editProfile')) + '</button>' +
-              '<button class="chip chip-danger" data-del="' + esc(p.id) + '" type="button">' + esc(t(lang, 'deleteProfile')) + '</button>' +
-            '</div>').join('') + '</div>'
-        : '') +
-      (profiles.length >= MAX_PROFILES
-        ? '<p class="gate-body">' + esc(t(lang, 'profilesMax')) + '</p>'
-        : '<form id="gate-form" class="profile-form">' +
-            '<p class="gate-privacy gate-error" id="gate-form-error" hidden></p>' +
-            '<label class="field"><span class="form-label">' + esc(t(lang, 'profileNameLabel')) + '</span>' +
-            '<input id="gate-name" type="text" maxlength="20" placeholder="' + esc(t(lang, 'profileNamePlaceholder')) + '" /></label>' +
-            '<div class="form-label">' + esc(t(lang, 'ageBandLabel')) + '</div>' +
-            '<div class="age-band-row" id="gate-bands">' + bandButtons(lang, '6-8') + '</div>' +
-            '<button class="send gate-save" type="submit">' + esc(t(lang, 'saveProfile')) + '</button>' +
-          '</form>') +
-      (profiles.length && !firstTime
-        ? '<div class="gate-actions"><button class="btn-ghost" id="gate-back" type="button">' + esc(t(lang, 'switchProfile')) + '</button></div>'
-        : '') +
-    '</div>');
+    '<main class="g-auth compact">' +
+      worldSection(
+        '<h1>' + esc(t(lang, firstTime ? 'addProfile' : 'manageProfiles')) + '</h1>' +
+        '<p class="g-lede">' + esc(t(lang, 'managerLede')) + '</p>') +
+      '<section class="g-panel">' +
+        (errorMsg ? '<p class="gate-privacy gate-error">' + esc(errorMsg) + '</p>' : '') +
+        (profiles.length
+          ? '<div class="profile-list">' + profiles.map((p) =>
+              '<div class="profile-row" style="--pc:' + (PROFILE_COLORS[p.color % 8] || PROFILE_COLORS[0]) + '">' +
+                '<span class="profile-row-name">' + esc(p.name) + '</span>' +
+                '<span class="profile-row-band">' + esc(t(lang, p.ageBand === '6-8' ? 'ageBand6to8' : 'ageBand9to12')) + '</span>' +
+                '<button class="chip" data-edit="' + esc(p.id) + '" type="button">' + esc(t(lang, 'editProfile')) + '</button>' +
+                '<button class="chip chip-danger" data-del="' + esc(p.id) + '" type="button">' + esc(t(lang, 'deleteProfile')) + '</button>' +
+              '</div>').join('') + '</div>'
+          : '') +
+        (profiles.length >= MAX_PROFILES
+          ? '<p class="gate-body">' + esc(t(lang, 'profilesMax')) + '</p>'
+          : '<form id="gate-form" class="profile-form">' +
+              '<p class="gate-privacy gate-error" id="gate-form-error" hidden></p>' +
+              '<label class="field"><span class="form-label">' + esc(t(lang, 'profileNameLabel')) + '</span>' +
+              '<input id="gate-name" type="text" maxlength="20" placeholder="' + esc(t(lang, 'profileNamePlaceholder')) + '" /></label>' +
+              '<div class="form-label">' + esc(t(lang, 'ageBandLabel')) + '</div>' +
+              '<div class="age-band-row" id="gate-bands">' + bandButtons(lang, '6-8') + '</div>' +
+              '<button class="send gate-save" type="submit">' + esc(t(lang, 'saveProfile')) + '</button>' +
+            '</form>') +
+        (profiles.length && !firstTime
+          ? '<div class="gate-actions"><button class="btn-ghost" id="gate-back" type="button">' + esc(t(lang, 'switchProfile')) + '</button></div>'
+          : '') +
+      '</section>' +
+    '</main>');
 
   let band = '6-8';
   const bandsEl = gateEl.querySelector('#gate-bands');

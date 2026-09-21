@@ -591,6 +591,17 @@ h1, h2, h3, .display { font-family: var(--font-display); letter-spacing: -0.01em
 }
 @keyframes gRise { from { opacity: 0; transform: translateY(22px) scale(.985); } to { opacity: 1; transform: none; } }
 
+/* biến thể compact — chọn/quản lý hồ sơ: cảnh co gọn, panel rộng hơn */
+.g-auth.compact { grid-template-columns: .92fr 1.08fr; min-height: 0; width: min(880px, 100%); }
+.g-auth.compact .g-stage { height: clamp(140px, 18vw, 190px); }
+.g-auth.compact .g-sparkle { width: 116px; height: 116px; top: 6px; }
+.g-auth.compact .g-buddy { width: 62px; height: 62px; }
+.g-auth.compact .g-token { width: 44px; height: 44px; border-radius: 13px; }
+.g-auth.compact .g-token svg { width: 24px; height: 24px; }
+.g-auth.compact .g-world h1 { font-size: clamp(24px, 2.6vw, 32px); }
+.g-auth.compact .g-panel .gate-actions { margin-top: 22px; }
+.g-auth.compact .g-panel .profile-list { margin-bottom: 4px; }
+
 .g-world {
   position: relative;
   padding: clamp(24px, 3vw, 40px);
