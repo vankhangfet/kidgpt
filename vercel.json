@@ -2,6 +2,13 @@
   "functions": {
     "api/**/*.js": { "maxDuration": 60 }
   },
+  "redirects": [
+    {
+      "source": "/firebase-config.js",
+      "destination": "/api/firebase-config",
+      "permanent": false
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

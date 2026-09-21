@@ -41,6 +41,8 @@ npx vercel dev               # open http://localhost:3000
 | `LLM_MODEL` | ✓ | Model name, e.g. `gpt-4o-mini` |
 | `LLM_EXTRA_BODY` | – | JSON merged into the request body, e.g. `{"thinking":{"type":"disabled"}}` on z.ai for 2–3× faster replies |
 | `FIREBASE_PROJECT_ID` | ✓ (with login) | Firebase project id for ID-token verification |
+| `FIREBASE_API_KEY` / `FIREBASE_APP_ID` | ✓ (with login) | Web-app config served to the frontend via `/api/firebase-config` |
+| `FIREBASE_AUTH_DOMAIN` | – | Defaults to `<FIREBASE_PROJECT_ID>.firebaseapp.com` |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | – | Enables 20 req/5 min/account/endpoint rate limiting (skipped when unset) |
 
 ## Tests
@@ -60,6 +62,11 @@ under `docs/`.
 
 1. Create a free Firebase project → Authentication → Sign-in method → enable **Google**
 2. Create a **Firestore** database (production mode)
-3. Register a Web app (Project settings → Your apps), then copy its config into `public/firebase-config.js` (apiKey/authDomain/projectId/appId — public by design). The committed file keeps placeholders; to run locally with your real values without dirtying git: `git update-index --skip-worktree public/firebase-config.js`
+3. Register a Web app (Project settings → Your apps). On Vercel, set `FIREBASE_API_KEY`,
+   `FIREBASE_APP_ID` (plus the existing `FIREBASE_PROJECT_ID`) in Project Settings — the
+   `/api/firebase-config` route builds the client config from them and `/firebase-config.js`
+   redirects there. Firebase web config is public by design; env vars keep the repo clean.
+   For local dev without `vercel dev`, fill the values into `public/firebase-config.js`
+   (placeholders committed) and optionally `git update-index --skip-worktree public/firebase-config.js`
 4. Paste the owner-only security rules from `docs/superpowers/specs/2026-09-17-kidgpt-auth-design.md` §4 into Firestore → Rules
-5. Set `FIREBASE_PROJECT_ID` on Vercel; add your deployed domain to Authentication → Settings → Authorized domains
+5. Add your deployed domain to Authentication → Settings → Authorized domains
