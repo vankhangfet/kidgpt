@@ -73,3 +73,11 @@ cầu login/link project), mở URL local (mặc định http://localhost:3000).
 - [ ] Trust chips ẩn <520px; xếp dọc <860px; full-bleed <400px; reduced-motion tắt sạch animation
 - [ ] Chọn hồ sơ & quản lý hồ sơ: badge Sparkle trên card, card hover lift, avatar gradient, nút Lưu gradient coral; luồng tạo/sửa/xóa hồ sơ hoạt động như cũ
 - [ ] Nền đốm confetti bay hiện ở cả 3 màn và không biến mất khi chuyển màn
+
+## Main page polish
+
+- [ ] Nền: gradient trời nhạt + 5 đốm confetti trôi rất nhạt (không che nội dung, tắt khi reduced-motion)
+- [ ] Topbar logo gradient teal, viền dưới gradient mỏng; rail subject gradient màu riêng, hover lift, nút chọn có bóng màu
+- [ ] Bubble của bé gradient coral; bubble Sparkle vẫn trắng sạch
+- [ ] Welcome bubble có badge Sparkle 72px; composer pill lớn + nút gửi tròn coral icon trắng
+- [ ] Games view vẫn hoạt động, nền mới không đè nội dung game
