@@ -13,8 +13,8 @@ const SHARED = [
 describe('games i18n keys', () => {
   it('has shared game ui strings in both languages', () => {
     for (const key of SHARED) {
-      expect(typeof t('vi', key)).toBe('string');
-      expect(typeof t('en', key)).toBe('string');
+      expect(t('vi', key)).toBeTruthy();
+      expect(t('en', key)).toBeTruthy();
     }
     for (let i = 1; i <= 3; i++) {
       expect(t('vi', 'trLv' + i)).toBeTruthy();
