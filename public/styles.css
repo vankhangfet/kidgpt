@@ -555,6 +555,17 @@ h1, h2, h3, .display { font-family: var(--font-display); letter-spacing: -0.01em
 .gate[hidden] { display: none; }
 .g-screens { width: 100%; display: grid; place-items: center; }
 
+/* nút đổi ngôn ngữ — góc phải trên, sống qua mọi màn gate */
+.g-lang {
+  position: absolute; top: 14px; right: 14px; z-index: 2;
+  border: 2px solid var(--border); background: var(--surface); color: var(--fg);
+  border-radius: var(--radius-pill); padding: 8px 14px; min-height: 40px;
+  font-family: var(--font-display); font-weight: 800; font-size: 14px;
+  cursor: pointer; box-shadow: var(--shadow-sm);
+  transition: transform .12s ease, border-color .12s;
+}
+.g-lang:hover { transform: translateY(-1px); border-color: var(--tutor); color: var(--tutor); }
+
 /* đốm confetti trôi — nền chung mọi màn gate */
 .g-dots { position: fixed; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
 .g-dots i { position: absolute; border-radius: 50%; opacity: .5; animation: gDriftUp 16s linear infinite; }

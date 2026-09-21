@@ -259,6 +259,11 @@ export function t(lang, key) {
   return L[key];
 }
 
+// Ngôn ngữ mặc định là tiếng Anh; chỉ dùng giá trị đã lưu nếu hợp lệ.
+export function resolveLang(stored) {
+  return stored === 'en' || stored === 'vi' ? stored : 'en';
+}
+
 export function subjectLabel(lang, subject) {
   const L = SUBJECT_LABELS[lang] || SUBJECT_LABELS.vi;
   return L[subject];

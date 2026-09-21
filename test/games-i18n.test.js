@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { t, SUBJECTS } from '../public/i18n.js';
+import { t, SUBJECTS, resolveLang } from '../public/i18n.js';
 
 const SHARED = [
   'gamesLabel', 'gamesSay', 'gameGo', 'gameBack', 'gameBackChat', 'gameReset', 'gemsLabel',
@@ -29,5 +29,18 @@ describe('games i18n keys', () => {
   });
   it('keeps games out of chat subjects (api contract)', () => {
     expect(SUBJECTS).not.toContain('games');
+  });
+});
+
+describe('resolveLang', () => {
+  it('defaults to english for missing or unknown values', () => {
+    expect(resolveLang(null)).toBe('en');
+    expect(resolveLang(undefined)).toBe('en');
+    expect(resolveLang('fr')).toBe('en');
+    expect(resolveLang('')).toBe('en');
+  });
+  it('keeps a stored vi or en', () => {
+    expect(resolveLang('vi')).toBe('vi');
+    expect(resolveLang('en')).toBe('en');
   });
 });

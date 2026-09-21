@@ -1,6 +1,6 @@
 import { esc, checkAnswer } from './util.js';
 import { renderAid } from './aids.js';
-import { t, SUBJECTS, subjectLabel, placeholderFor, suggestsFor, STRINGS } from './i18n.js';
+import { t, SUBJECTS, subjectLabel, placeholderFor, suggestsFor, STRINGS, resolveLang } from './i18n.js';
 import { initGate, reopenGate } from './gate.js';
 import { getAuthToken } from './auth.js';
 import { showGames, hideGames, refreshGames } from './games/hub.js';
@@ -27,9 +27,7 @@ const $$ = (s, r = document) => Array.prototype.slice.call(r.querySelectorAll(s)
 const stream = $('#stream');
 const input = $('#input');
 
-const storedLang = localStorage.getItem('kidgpt-lang');
-const browserLang = String(navigator.language || 'vi').toLowerCase().startsWith('en') ? 'en' : 'vi';
-let lang = storedLang === 'en' || storedLang === 'vi' ? storedLang : browserLang;
+let lang = resolveLang(localStorage.getItem('kidgpt-lang'));
 
 let history = [];          // [{role, content}] — trim 10 lượt
 let active = null;         // { plan, question, revealed, stepEls, nextBtn }
@@ -528,6 +526,12 @@ function init() {
   applyLang();
   initGate({
     onUnlock: (profile) => {
+      // gate có thể đã đổi ngôn ngữ qua nút EN/VI — đồng bộ vào app
+      const gateLang = resolveLang(document.documentElement.lang === 'vi' ? 'vi' : 'en');
+      if (gateLang !== lang) {
+        lang = gateLang;
+        applyLang();
+      }
       const changed = currentProfile && currentProfile.id !== profile.id;
       currentProfile = profile;
       const chip = $('#profileChip');

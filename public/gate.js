@@ -16,13 +16,24 @@ let gateEl = null;
 let onUnlock = null;
 let currentUser = null;
 let editingId = null; // null = đang tạo mới; string = đang sửa profile đó
+let refreshFn = null; // render lại màn gate hiện tại khi đổi ngôn ngữ
 let currentLang = () => (document.documentElement.lang === 'en' ? 'en' : 'vi');
 
 export function initGate(callbacks) {
   onUnlock = callbacks.onUnlock;
   gateEl = document.getElementById('gate');
-  gateEl.innerHTML = '<div class="g-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>'
+  gateEl.innerHTML = '<button class="g-lang" id="gate-lang" type="button"></button>'
+    + '<div class="g-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>'
     + '<div class="g-screens"></div>';
+  const langBtn = document.getElementById('gate-lang');
+  updateLangBtn();
+  langBtn.addEventListener('click', () => {
+    const next = currentLang() === 'en' ? 'vi' : 'en';
+    document.documentElement.lang = next;
+    try { localStorage.setItem('kidgpt-lang', next); } catch (e) { /* private mode */ }
+    updateLangBtn();
+    if (refreshFn) refreshFn();
+  });
   if (!isFirebaseConfigured()) {
     renderConfigError();
     return;
@@ -32,6 +43,14 @@ export function initGate(callbacks) {
     if (!user) { renderLogin(); return; }
     await route();
   });
+}
+
+function updateLangBtn() {
+  const langBtn = gateEl ? gateEl.querySelector('#gate-lang') : null;
+  if (!langBtn) return;
+  const lang = currentLang();
+  langBtn.textContent = lang === 'en' ? 'VI' : 'EN';
+  langBtn.setAttribute('aria-label', t(lang, 'langAria'));
 }
 
 export function reopenGate() {
@@ -51,6 +70,7 @@ async function route() {
 
 function renderLoadError() {
   const lang = currentLang();
+  refreshFn = () => route();
   show(
     '<div class="gate-card">' +
       HERO_BADGE_SAD +
@@ -61,12 +81,14 @@ function renderLoadError() {
 }
 
 function renderConfigError() {
+  refreshFn = () => renderConfigError();
   show('<div class="gate-card">' + HERO_BADGE_SAD + '<p class="gate-body">' +
     esc(t(currentLang(), 'gateConfigError')) + '</p></div>');
 }
 
 function renderLogin() {
   const lang = currentLang();
+  refreshFn = renderLogin;
   show(
     '<main class="g-auth" aria-label="KidGPT">' +
       '<section class="g-world">' +
@@ -149,6 +171,7 @@ function profileCard(p, lang) {
 
 function renderPicker(profiles) {
   const lang = currentLang();
+  refreshFn = () => renderPicker(profiles);
   show(
     '<div class="gate-card gate-wide">' +
       HERO_BADGE +
@@ -185,6 +208,7 @@ function bandButtons(lang, selected) {
 
 function renderManager(profiles, firstTime, errorMsg) {
   const lang = currentLang();
+  refreshFn = () => renderManager(profiles, firstTime);
   editingId = null;
   show(
     '<div class="gate-card gate-wide">' +
@@ -284,7 +308,8 @@ function show(html) {
   gateEl.hidden = false;
   const app = document.querySelector('.app');
   if (app && 'inert' in app) app.inert = true;
-  const first = gateEl.querySelector('button');
+  // focus nút đầu TIÊN CỦA MÀN (bỏ qua nút đổi ngôn ngữ trong shell)
+  const first = screens.querySelector('button');
   if (first) first.focus();
 }
 function hide() {
